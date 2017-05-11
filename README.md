@@ -69,9 +69,6 @@ The following is an example directoy layout, which is used to create a customize
 │   └── entrypoint.sh
 ├── builder.sh
 ├── output
-│   ├── lede-17.01.0-r3205-59508e3-ramips-mt7620-device-wt3020-8m.manifest
-│   ├── lede-17.01.0-r3205-59508e3-ramips-mt7620-wt3020-8M-squashfs-factory.bin
-│   ├── lede-17.01.0-r3205-59508e3-ramips-mt7620-wt3020-8M-squashfs-sysupgrade.bin
 │   ├── lede-17.01.1-ramips-mt7620-device-wt3020-8m.manifest
 │   ├── lede-17.01.1-ramips-mt7620-wt3020-8M-squashfs-factory.bin
 │   ├── lede-17.01.1-ramips-mt7620-wt3020-8M-squashfs-sysupgrade.bin
