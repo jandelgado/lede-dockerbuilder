@@ -1,0 +1,4 @@
+output/
+rootfs-overlay/*
+rootfs-overlay/!README
+*~
