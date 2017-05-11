@@ -41,8 +41,7 @@ In addition the following optional parameters can be set, to further control out
 # LEDE profile to use
 LEDE_PROFILE=wt3020-8M
 
-# specify the URL where the builder can be downloaded. TARGET, SUBTARGET and
-# RELEASE are only used here to specify LEDE_BUILDER_URL, which is mandatory.
+# specify the URL where the builder can be downloaded. 
 LEDE_RELEASE=17.01.1
 LEDE_TARGET=ramips
 LEDE_SUBTARGET=mt7620
