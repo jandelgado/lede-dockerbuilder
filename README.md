@@ -19,7 +19,7 @@ $ git clone https://github.com/jandelgado/lede-dockerbuilder.git
 $ cd lede-dockerbuilder
 $ ./builder.sh build example.cfg
 ```
-Your custom imagas can now be found in the `output` diretory.
+Your custom images can now be found in the `output` diretory.
 
 The `build` command will first build the docker image containing the LEDE image
 builder. The resulting docker image is per default tagged with
@@ -129,9 +129,9 @@ router (including the generated output).
 Run `./builder.sh shell CONFIGFILE` to get a shell into the docker container,
 e.g. `./builder.sh shell example.cfg`.
 
-## Building OpwnWRT images
+## Building OpenWRT images
 The file [example-openwrt.cfg](example-openwrt.cfg) contains an example which
-uses the OpenWrt image builder to create an image for the [TP-Link WR1043ND
+uses the OpenWRT image builder to create an image for the [TP-Link WR1043ND
 router](https://wiki.openwrt.org/toh/tp-link/tl-wr1043nd).
 
 # Author
