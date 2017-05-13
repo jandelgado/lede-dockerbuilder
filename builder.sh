@@ -35,7 +35,7 @@ function usage_and_exit {
 function build_docker_image  {
     echo "building container $IMAGE_TAG ..."
 	sudo docker build --build-arg BUILDER_URL="$LEDE_BUILDER_URL" \
-                      -t $IMAGE_TAG .
+                      -t $IMAGE_TAG docker
 }
 
 # run the builder in the container.

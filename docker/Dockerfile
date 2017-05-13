@@ -1,4 +1,5 @@
 FROM debian:8 
+LABEL maintainer "Jan Delgado <delgadoprojects@gmail.com>"
 
 ARG BUILDER_URL
 
@@ -12,10 +13,11 @@ RUN apt-get update \
 
 RUN mkdir -p /lede/imagebuilder
 
-# install the image builder
-RUN wget $BUILDER_URL -O - | \
-      tar xJf - --strip-components=1 \
-              -C /lede/imagebuilder 
+# install the image builder. use tmpfile so that tar's compression
+# autodetection works.
+RUN wget $BUILDER_URL -O /tmp/imagebuilder && \
+      tar xf /tmp/imagebuilder --strip-components=1 -C /lede/imagebuilder &&\
+      rm -f /tmp/imagebuilder
 
 WORKDIR "/lede/imagebuilder"
 
