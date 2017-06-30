@@ -19,7 +19,7 @@ function usage_and_exit {
     echo "  COMMAND is one of:"
     echo "    build-docker-image- just build the docker image"
     echo "    build             - build docker image, then start container and build the LEDE image"
-    echo "    shell             - start shell in docker cotainer"
+    echo "    shell             - start shell in docker container"
     echo "  CONFIGFILE          - configuraton file to use"
     echo "  OUTPUT_DIR          - output directory (default $OUTPUT_DIR)"
     echo "  ROOTFS_OVERLAY      - rootfs-overlay directory (default $ROOTFS_OVERLAY)"

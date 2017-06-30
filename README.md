@@ -38,7 +38,7 @@ Usage: ./builder.sh COMMAND CONFIGFILE [-o OUTPUT_DIR] [-f ROOTFS_OVERLAY]
   COMMAND is one of:
     build-docker-image- just build the docker image
     build             - build docker image, then start container and build the LEDE image
-    shell             - start shell in docker cotainer
+    shell             - start shell in docker container
   CONFIGFILE          - configuraton file to use
   OUTPUT_DIR          - output directory (default /home/paco/src/lede-dockerbuilder/output)
   ROOTFS_OVERLAY      - rootfs-overlay directory (default /home/paco/src/lede-dockerbuilder/rootfs-overlay)
