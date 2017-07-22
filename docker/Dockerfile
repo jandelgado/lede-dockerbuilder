@@ -1,15 +1,19 @@
 FROM debian:8 
-LABEL maintainer "Jan Delgado <delgadoprojects@gmail.com>"
+LABEL maintainer "Jan Delgado <jdelgado@gmx.net>"
 
 ARG BUILDER_URL
 
-RUN echo "deb http://ftp.debian.org/debian jessie-backports main" >> /etc/apt/sources.list
-RUN apt-get update \
+RUN echo "deb http://ftp.debian.org/debian jessie-backports main" >> /etc/apt/sources.list \
+    && apt-get update \
     && apt-get -t jessie-backports install "gosu" \
     && apt-get install -y --no-install-recommends ca-certificates wget  \
-                       subversion build-essential libncurses5-dev zlib1g-dev \
-                       gawk git ccache gettext libssl-dev xsltproc file unzip \
-                       python 
+                  subversion build-essential libncurses5-dev zlib1g-dev \
+                  gawk git ccache gettext libssl-dev xsltproc file unzip \
+                  python \
+    && apt-get autoclean \
+    && apt-get clean \
+    && apt-get autoremove\
+    && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /lede/imagebuilder
 
