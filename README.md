@@ -20,7 +20,7 @@ builder. On the builder host, Docker is the only requirement.
 ```
 $ git clone https://github.com/jandelgado/lede-dockerbuilder.git
 $ cd lede-dockerbuilder
-$ ./builder.sh build example.conf
+$ ./builder.sh build example-nexx-wt3020.conf
 ```
 Your custom images can now be found in the `output` diretory.
 
