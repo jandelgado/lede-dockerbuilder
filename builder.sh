@@ -44,8 +44,8 @@ function build_lede_image {
 	sudo docker run \
 			--rm \
 			-e GOSU_USER=`id -u`:`id -g` \
-            -v $(readlink -e $ROOTFS_OVERLAY):/lede/rootfs-overlay:z \
-            -v $(readlink -e $OUTPUT_DIR):/lede/output:z \
+            -v $(cd $ROOTFS_OVERLAY; pwd):/lede/rootfs-overlay:z \
+            -v $(cd $OUTPUT_DIR; pwd):/lede/output:z \
 			-ti --rm $IMAGE_TAG \
 			  make image PROFILE="$LEDE_PROFILE" \
 				PACKAGES="$LEDE_PACKAGES" \
@@ -58,8 +58,8 @@ function run_shell {
 	sudo docker run \
 			--rm \
 			-e GOSU_USER=`id -u`:`id -g` \
-			-v $ROOTFS_OVERLAY:/lede/rootfs-overlay:z \
-			-v $OUTPUT_DIR:/lede/output:z \
+            -v $(cd $ROOTFS_OVERLAY; pwd):/lede/rootfs-overlay:z \
+            -v $(cd $OUTPUT_DIR; pwd):/lede/output:z \
 			-ti --rm $IMAGE_TAG
 }
 
