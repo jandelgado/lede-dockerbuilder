@@ -34,15 +34,19 @@ available in the `output/` directory.
 ```
 Dockerized LEDE/OpenWRT image builder.
 
-Usage: ./builder.sh COMMAND CONFIGFILE [-o OUTPUT_DIR] [-f ROOTFS_OVERLAY]
+Usage: ./builder.sh COMMAND CONFIGFILE [OPTIONS] 
   COMMAND is one of:
     build-docker-image- just build the docker image
     build             - build docker image, then start container and build the LEDE image
     shell             - start shell in docker container
   CONFIGFILE          - configuraton file to use
-  OUTPUT_DIR          - output directory (default /home/paco/src/lede-dockerbuilder/output)
-  ROOTFS_OVERLAY      - rootfs-overlay directory (default /home/paco/src/lede-dockerbuilder/rootfs-overlay)
-  command line options -o, -f override config file settings.
+
+  OPTIONS:
+  -o OUTPUT_DIR       - output directory 
+  -f ROOTFS_OVERLAY   - rootfs-overlay directory 
+  --skip-sudo         - call docker directly, without sudo
+
+  command line options -o, -f, -r override config file settings.
 
 Example:
   ./builder.sh build example.cfg -o output -f myrootfs

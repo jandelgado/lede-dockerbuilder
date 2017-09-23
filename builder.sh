@@ -13,41 +13,50 @@ OUTPUT_DIR=$SCRIPT_DIR/output
 ROOTFS_OVERLAY=$SCRIPT_DIR/rootfs-overlay
 
 function usage_and_exit {
-    echo "Dockerized LEDE/OpenWRT image builder."
-    echo ""
-    echo "Usage: $0 COMMAND CONFIGFILE [-o OUTPUT_DIR] [-f ROOTFS_OVERLAY]"
-    echo "  COMMAND is one of:"
-    echo "    build-docker-image- just build the docker image"
-    echo "    build             - build docker image, then start container and build the LEDE image"
-    echo "    shell             - start shell in docker container"
-    echo "  CONFIGFILE          - configuraton file to use"
-    echo "  OUTPUT_DIR          - output directory (default $OUTPUT_DIR)"
-    echo "  ROOTFS_OVERLAY      - rootfs-overlay directory (default $ROOTFS_OVERLAY)"
-    echo "  command line options -o, -f override config file settings."
-    echo ""
-    echo "Example:"
-    echo "  $0 build example.cfg -o output -f myrootfs"
-    exit 1
+    cat<<EOT
+Dockerized LEDE/OpenWRT image builder.
+
+Usage: $1 COMMAND CONFIGFILE [OPTIONS] 
+  COMMAND is one of:
+    build-docker-image- just build the docker image
+    build             - build docker image, then start container and build the LEDE image
+    shell             - start shell in docker container
+  CONFIGFILE          - configuraton file to use
+
+  OPTIONS:
+  -o OUTPUT_DIR       - output directory (default $OUTPUT_DIR)
+  -f ROOTFS_OVERLAY   - rootfs-overlay directory (default $ROOTFS_OVERLAY)
+  --skip-sudo         - call docker directly, without sudo
+
+  command line options -o, -f, -r override config file settings.
+
+Example:
+  ./builder.sh build example.cfg -o output -f myrootfs
+EOT
+    exit 0
 }
 
 # build container and pass in the actual builder to use
 function build_docker_image  {
     echo "building container $IMAGE_TAG ..."
-	sudo docker build --build-arg BUILDER_URL="$LEDE_BUILDER_URL" \
+	$SUDO docker build --build-arg BUILDER_URL="$LEDE_BUILDER_URL" \
                       -t $IMAGE_TAG docker
+}
+
+function run_cmd_in_container {
+	$SUDO docker run \
+			--rm \
+			-e GOSU_USER=`id -u`:`id -g` \
+            -v $(cd $ROOTFS_OVERLAY; pwd):/lede/rootfs-overlay:z \
+            -v $(cd $OUTPUT_DIR; pwd):/lede/output:z \
+			-ti --rm $IMAGE_TAG "$@"
 }
 
 # run the builder in the container.
 function build_lede_image {
 	mkdir -p $OUTPUT_DIR
     echo "building image for $LEDE_PROFILE ..."
-	sudo docker run \
-			--rm \
-			-e GOSU_USER=`id -u`:`id -g` \
-            -v $(cd $ROOTFS_OVERLAY; pwd):/lede/rootfs-overlay:z \
-            -v $(cd $OUTPUT_DIR; pwd):/lede/output:z \
-			-ti --rm $IMAGE_TAG \
-			  make image PROFILE="$LEDE_PROFILE" \
+    run_cmd_in_container  make image PROFILE="$LEDE_PROFILE" \
 				PACKAGES="$LEDE_PACKAGES" \
 				FILES="/lede/rootfs-overlay" \
 				BIN_DIR="/lede/output"
@@ -55,50 +64,55 @@ function build_lede_image {
 
 # run a shell in the container, useful for debugging.
 function run_shell {
-	sudo docker run \
-			--rm \
-			-e GOSU_USER=`id -u`:`id -g` \
-            -v $(cd $ROOTFS_OVERLAY; pwd):/lede/rootfs-overlay:z \
-            -v $(cd $OUTPUT_DIR; pwd):/lede/output:z \
-			-ti --rm $IMAGE_TAG
+    run_cmd_in_container bash
+}
+
+# print message and exit
+function fail {
+    echo "ERROR: $*" >&2
+    exit 1
 }
 
 if [ $# -lt 2 ]; then
-    usage_and_exit
+    usage_and_exit $0
 fi
 
 COMMAND=$1; shift
 CONFIG_FILE=$1; shift
+SUDO=sudo
 
 # pull in config file
-if [ ! -f $CONFIG_FILE ]; then 
-    echo "error opening $CONFIG_FILE"
-    exit 1
-fi
-eval "$(cat $CONFIG_FILE)"
+[ ! -f "$CONFIG_FILE" ] && fail "can not open $CONFIG_FILE"
+eval "$(cat "$CONFIG_FILE")"
 
 # parse cli args, can override config file params
-while [[ $# -gt 1 ]]; do
+while [[ $# -ge 1 ]]; do
     key="$1"
     case $key in
         -f) ROOTFS_OVERLAY="$2"; shift ;;
         -o) OUTPUT_DIR="$2"; shift ;;
-        *) echo "invalid option: $key"; exit 1;;
+        --skip-sudo) SUDO="" ;;
+        *) fail "invalid option: $key";;
     esac
     shift
 done
 
-echo "--- configuration -------------------"
-echo "LEDE_RELEASE......: $LEDE_RELEASE"
-echo "LEDE_TARGET.......: $LEDE_TARGET"
-echo "LEDE_SUBTARGET....: $LEDE_SUBTARGET"
-echo "LEDE_PROFILE......: $LEDE_PROFILE"
-echo "LEDE_BUILDER_URL..: $LEDE_BUILDER_URL"
+[ ! -d "$OUTPUT_DIR" ] && fail "output-dir: no such directory $OUTPUT_DIR"
+[ ! -d "$ROOTFS_OVERLAY" ] && fail "rootfs-overlay: no such directory $ROOTFS_OVERLAY"
+
 IMAGE_TAG=$IMAGE_TAG:$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET 
-echo "DOCKER_IMAGE_TAG..: $IMAGE_TAG"
-echo "OUTPUT_DIR........: $OUTPUT_DIR"
-echo "ROOTFS_OVERLAY....: $ROOTFS_OVERLAY"
-echo "-------------------------------------"
+cat<<EOT
+--- configuration ------------------------------
+LEDE_RELEASE......: $LEDE_RELEASE
+LEDE_TARGET.......: $LEDE_TARGET
+LEDE_SUBTARGET....: $LEDE_SUBTARGET
+LEDE_PROFILE......: $LEDE_PROFILE
+LEDE_BUILDER_URL..: $LEDE_BUILDER_URL
+DOCKER_IMAGE_TAG..: $IMAGE_TAG
+OUTPUT_DIR........: $OUTPUT_DIR
+ROOTFS_OVERLAY....: $ROOTFS_OVERLAY
+------------------------------------------------
+EOT
 
 case $COMMAND in
      build) 
@@ -108,7 +122,6 @@ case $COMMAND in
          build_docker_image  ;;
      shell) 
          run_shell ;;
-     *) usage_and_exit
+     *) usage_and_exit $0
 esac
-
 
