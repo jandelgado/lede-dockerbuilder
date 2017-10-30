@@ -8,6 +8,12 @@ docker container and the
 [OpenWrt](https://wiki.openwrt.org/doc/howto/obtain.firmware.generate) image
 builder. On the builder host, Docker is the only requirement.
 
+### Note
+
+The lede-dockerbuilder uses pre-compiled packages to build the final image. 
+Look [here](https://github.com/jandelgado/lede-dockercompiler) if you are looking 
+for a docker images to compile LEDE/OpenWRT completely from source.
+
 ## Why
 
 * customized and optimized (size) images with your personal configurations
