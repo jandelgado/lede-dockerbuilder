@@ -1,7 +1,6 @@
 FROM debian:8 
 LABEL maintainer "Jan Delgado <jdelgado@gmx.net>"
 
-ARG BUILDER_URL
 
 RUN echo "deb http://ftp.debian.org/debian jessie-backports main" >> /etc/apt/sources.list \
     && apt-get update \
@@ -15,19 +14,19 @@ RUN echo "deb http://ftp.debian.org/debian jessie-backports main" >> /etc/apt/so
     && apt-get autoremove\
     && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /lede/imagebuilder
-
-# install the image builder. use tmpfile so that tar's compression
-# autodetection works.
-RUN wget $BUILDER_URL -O /tmp/imagebuilder && \
-      tar xf /tmp/imagebuilder --strip-components=1 -C /lede/imagebuilder &&\
-      rm -f /tmp/imagebuilder
-
-WORKDIR "/lede/imagebuilder"
-
 ADD etc/entrypoint.sh /usr/local/bin/
 RUN chmod 755 /usr/local/bin/entrypoint.sh 
 
+# install the image builder. use tmpfile so that tar's compression
+# autodetection works.
+ARG BUILDER_URL
+RUN mkdir -p /lede/imagebuilder && \
+    wget  --progress=bar:force:noscroll $BUILDER_URL -O /tmp/imagebuilder && \
+      tar xf /tmp/imagebuilder --strip-components=1 -C /lede/imagebuilder &&\
+      rm -f /tmp/imagebuilder
+
+
+WORKDIR "/lede/imagebuilder"
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["/bin/bash"]
 
