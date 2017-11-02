@@ -87,6 +87,13 @@ output and image creation:
     to `rootfs-overlay` in the scripts directory (can be overridden by -f
     parameter)
 
+Use the `BASEDIR_CONFIG_FILE` variable to set locations of `OUTPUT_DIR` or
+`ROOTFS_OVERLAY` relative to the configuration files location. This allows
+self-contained projects outside of the lede-dockerbuilder folder. If e.g.
+`ROOTFS_OVERLAY=$BASEDIR_CONFIG_FILE/rootfs-overlay` is set, then the 
+rootfs-overlay directory is expected to be in the same directory as the 
+configuration file.
+
 [Example configuration](example.conf) for my [NEXX
 WT3020](https://wiki.openwrt.org/toh/nexx/wt3020) router, where I have an
 encrypted USB disk attached so I can use it as a simple NAS.
