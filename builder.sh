@@ -81,8 +81,9 @@ COMMAND=$1; shift
 CONFIG_FILE=$1; shift
 SUDO=sudo
 
-# pull in config file
+# pull in config file, making $BASEDIR_CONFIG_FILE available inside`
 [ ! -f "$CONFIG_FILE" ] && fail "can not open $CONFIG_FILE"
+BASEDIR_CONFIG_FILE=$( cd "$( dirname "$CONFIG_FILE" )" && pwd )
 eval "$(cat "$CONFIG_FILE")"
 
 # parse cli args, can override config file params
