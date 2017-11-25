@@ -181,6 +181,23 @@ contains an example which uses the OpenWRT image builder to create an image for
 the [TP-Link WR1043ND
 router](https://wiki.openwrt.org/toh/tp-link/tl-wr1043nd).
 
+## Examples
+
+These examples evolved from images I use myself.
+
+* [Minimal LEDE image with LUCI web GUI for the Raspberry PI 2](example-rpi2.conf). Just ~8MB gziped. I use this image on my home dnsmasq/openvpn 'server'.  
+* [OpenWRT image for the TP-Link WR1043ND](example-openwrt-wrt1043nd.conf)
+* [LEDE image with samba, vsftpd and encrypted usb disk for NEXX-WT3020](example-nexx-wt3020.conf). Predessor of ...
+* [LEDE image with samba, vsftpd and encrypted usb disk for GINET-GL-M300N](example-ginet-gl-mt300n.conf). This is my travel router setup where I have an encrypted USB disk connected to the router.
+
+To build an example run `./builder.sh build <config-file>`, e.g.
+
+```shell
+$ ./builder.sh build example-rpi2.conf 
+```
+
+The resulting image can be found in the `output/` directory.
+
 ## Author
 
 Jan Delgado
