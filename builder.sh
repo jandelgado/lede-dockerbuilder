@@ -38,7 +38,7 @@ EOT
 
 # build container and pass in the actual builder to use
 function build_docker_image  {
-    echo "building container $IMAGE_TAG ..."
+    echo "building docker image $IMAGE_TAG ..."
 	$SUDO docker build --build-arg BUILDER_URL="$LEDE_BUILDER_URL" \
                       -t $IMAGE_TAG docker
 }
