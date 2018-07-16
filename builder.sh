@@ -54,7 +54,6 @@ function run_cmd_in_container {
 
 # run the builder in the container.
 function build_lede_image {
-	mkdir -p $OUTPUT_DIR
     echo "building image for $LEDE_PROFILE ..."
     run_cmd_in_container  make image PROFILE="$LEDE_PROFILE" \
 				PACKAGES="$LEDE_PACKAGES" \
@@ -98,8 +97,7 @@ while [[ $# -ge 1 ]]; do
     shift
 done
 
-[ ! -d "$OUTPUT_DIR" ] && fail "output-dir: no such directory $OUTPUT_DIR"
-[ ! -d "$ROOTFS_OVERLAY" ] && fail "rootfs-overlay: no such directory $ROOTFS_OVERLAY"
+mkdir -p $OUTPUT_DIR $ROOTFS_OVERLAY
 
 IMAGE_TAG=$IMAGE_TAG:$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET 
 cat<<EOT
