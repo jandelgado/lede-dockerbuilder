@@ -1,0 +1,21 @@
+sudo: required
+dist: trusty
+language: bash
+
+services:
+  - docker
+
+addons:
+  apt:
+    packages:
+      - shellcheck
+
+jobs:
+  include:
+    - stage: check script
+      script:
+        - shellcheck builder.sh
+    - stage: check examples
+      script:
+        - mkdir -p output
+        - for f in *.conf; do ./builder.sh build $f; done

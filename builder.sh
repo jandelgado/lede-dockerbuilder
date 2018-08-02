@@ -1,11 +1,11 @@
 #!/bin/bash
-# A Docker based LEDE image builder.
+# A Docker based OpenWRT image builder.
 # (c) Jan Delgado 02-2017
 
 set -e
 
 # base Tag to use for docker imag
-IMAGE_TAG=lede-imagebuilder
+IMAGE_TAG=openwrt-imagebuilder
 
 SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 # may be overridden in the config file
@@ -46,15 +46,15 @@ function build_docker_image  {
 function run_cmd_in_container {
 	$SUDO docker run \
 			--rm \
-			-e GOSU_USER=`id -u`:`id -g` \
-            -v $(cd $ROOTFS_OVERLAY; pwd):/lede/rootfs-overlay:z \
-            -v $(cd $OUTPUT_DIR; pwd):/lede/output:z \
-			-ti --rm $IMAGE_TAG "$@"
+            -e GOSU_USER="$(id -ur):$(id -g)" \
+            -v "$(cd "$ROOTFS_OVERLAY"; pwd)":/lede/rootfs-overlay:z \
+            -v "$(cd "$OUTPUT_DIR"; pwd)":/lede/output:z \
+			-ti --rm "$IMAGE_TAG" "$@"
 }
 
 # run the builder in the container.
 function build_lede_image {
-	mkdir -p $OUTPUT_DIR
+	mkdir -p "$OUTPUT_DIR"
     echo "building image for $LEDE_PROFILE ..."
     run_cmd_in_container  make image PROFILE="$LEDE_PROFILE" \
 				PACKAGES="$LEDE_PACKAGES" \
@@ -74,7 +74,7 @@ function fail {
 }
 
 if [ $# -lt 2 ]; then
-    usage_and_exit $0
+    usage_and_exit "$0"
 fi
 
 COMMAND=$1; shift
@@ -83,6 +83,7 @@ SUDO=sudo
 
 # pull in config file, making $BASEDIR_CONFIG_FILE available inside`
 [ ! -f "$CONFIG_FILE" ] && fail "can not open $CONFIG_FILE"
+# shellcheck disable=SC2034
 BASEDIR_CONFIG_FILE=$( cd "$( dirname "$CONFIG_FILE" )" && pwd )
 eval "$(cat "$CONFIG_FILE")"
 
@@ -123,6 +124,6 @@ case $COMMAND in
          build_docker_image  ;;
      shell) 
          run_shell ;;
-     *) usage_and_exit $0
+     *) usage_and_exit "$0"
 esac
 

@@ -8,7 +8,7 @@ RUN echo "deb http://ftp.debian.org/debian jessie-backports main" >> /etc/apt/so
     && apt-get install -y --no-install-recommends ca-certificates wget  \
                   subversion build-essential libncurses5-dev zlib1g-dev \
                   gawk git ccache gettext libssl-dev xsltproc file unzip \
-                  python \
+                  python time \
     && apt-get autoclean \
     && apt-get clean \
     && apt-get autoremove\
