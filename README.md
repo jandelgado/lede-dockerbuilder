@@ -93,9 +93,8 @@ mandatory:
 URL of the image builder binary, `LEDE_BUILDER_URL` as well as for the
 construction for the tag of the docker image.
 
-TODO
-You can find the proper values (for LEDE 17.01) by browsing the LEDE website
-[here](http://ftp.halifax.rwth-aachen.de/lede/releases/17.01.1/targets/)  and
+You can find the proper values (for 18.06) by browsing the OpenWRT website
+[here](https://downloads.openwrt.org/releases/18.06.0/targets/)  and
 [here](https://lede-project.org/toh/views/toh_admin_fw-pkg-download).
 
 In addition the following optional parameters can be set, to further control
@@ -161,9 +160,9 @@ router (including the generated output).
 ├── example.cfg
 ├── example-openwrt.cfg
 ├── output
-│   ├── lede-17.01.1-ramips-mt7620-device-wt3020-8m.manifest
-│   ├── lede-17.01.1-ramips-mt7620-wt3020-8M-squashfs-factory.bin
-│   ├── lede-17.01.1-ramips-mt7620-wt3020-8M-squashfs-sysupgrade.bin
+│   ├── openwrt-18.06.0-ramips-mt7620-device-wt3020-8m.manifest
+│   ├── openwrt-18.06.0-ramips-mt7620-wt3020-8M-squashfs-factory.bin
+│   ├── openwrt-18.06.0-ramips-mt7620-wt3020-8M-squashfs-sysupgrade.bin
 │   └── sha256sums
 ├── README.md
 └── rootfs-overlay
