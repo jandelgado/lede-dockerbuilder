@@ -113,7 +113,7 @@ self-contained projects outside of the lede-dockerbuilder folder. If e.g.
 rootfs-overlay directory is expected to be in the same directory as the 
 configuration file.
 
-[Example configuration](example.conf) for my [NEXX
+[Example configuration](example-nexx-wt3020.conf) for my [NEXX
 WT3020](https://wiki.openwrt.org/toh/nexx/wt3020) router, where I have an
 encrypted USB disk attached so I can use it as a simple NAS.
 
