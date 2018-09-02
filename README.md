@@ -62,7 +62,7 @@ Dockerized LEDE/OpenWRT image builder.
 Usage: ./builder.sh COMMAND CONFIGFILE [OPTIONS] 
   COMMAND is one of:
     build-docker-image- just build the docker image
-    build             - build docker image, then start container and build the LEDE image
+    build             - build docker image, then start container and build the LEDE/OpenWRT image
     shell             - start shell in docker container
   CONFIGFILE          - configuraton file to use
 
@@ -82,16 +82,15 @@ Example:
 The configuration file is quiet self-explanatory. The following parameters are
 mandatory:
 
-  * `LEDE_TARGET` - Target architecture
-  * `LEDE_SUBTARGET` - Sub target architecture
-  * `LEDE_RELEASE` - LEDE release to use
-  * `LEDE_PROFILE` - LEDE profile to use
-  * `LEDE_BUILDER_URL` - URL of the LEDE image builder to use
-  * `LEDE_PACKAGES` - list of packages to include/exclude. Prepend package to be excluded with `-`.
+* `LEDE_TARGET` - Target architecture
+* `LEDE_SUBTARGET` - Sub target architecture
+* `LEDE_RELEASE` - LEDE release to use
+* `LEDE_PROFILE` - LEDE profile to use
+* `LEDE_PACKAGES` - list of packages to include/exclude. Prepend package to be excluded with `-`.
 
 `LEDE_TARGET`, `LEDE_SUBTARGET` and `LEDE_RELEASE` are used to construct the
-URL of the image builder binary, `LEDE_BUILDER_URL` as well as for the
-construction for the tag of the docker image.
+URL of the image builder binary well as for the construction for the tag of the
+docker image.
 
 You can find the proper values (for 18.06) by browsing the OpenWRT website
 [here](https://downloads.openwrt.org/releases/18.06.0/targets/)  and
@@ -100,32 +99,33 @@ You can find the proper values (for 18.06) by browsing the OpenWRT website
 In addition the following optional parameters can be set, to further control
 output and image creation:
 
-  * `OUTPUT_DIR` - path where resulting images are stored. Defaults to `output`
-    in the scripts directory (can be overridden by -o parameter)
-  * `ROOTFS_OVERLAY` - path of the root file system overlay directory. Defaults
-    to `rootfs-overlay` in the scripts directory (can be overridden by -f
-    parameter)
+* `OUTPUT_DIR` - path where resulting images are stored. Defaults to `output`
+  in the scripts directory (can be overridden by -o parameter). Will be
+  automatically created.
+* `ROOTFS_OVERLAY` - path of the root file system overlay directory. Defaults
+  to `rootfs-overlay` in the scripts directory (can be overridden by -f
+  parameter).
+* `LEDE_BUILDER_URL` - URL of the LEDE/OpenWRT image builder to use, override
+   if you do not wish to use the default builder
+   (`https://downloads.openwrt.org/releases/$LEDE_RELEASE/targets/$LEDE_TARGET/$LEDE_SUBTARGET/openwrt-imagebuilder-$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET.Linux-x86_64.tar.xz`)
 
 Use the `BASEDIR_CONFIG_FILE` variable to set locations of `OUTPUT_DIR` or
 `ROOTFS_OVERLAY` relative to the configuration files location. This allows
 self-contained projects outside of the lede-dockerbuilder folder. If e.g.
-`ROOTFS_OVERLAY=$BASEDIR_CONFIG_FILE/rootfs-overlay` is set, then the 
-rootfs-overlay directory is expected to be in the same directory as the 
+`ROOTFS_OVERLAY=$BASEDIR_CONFIG_FILE/rootfs-overlay` is set, then the
+rootfs-overlay directory is expected to be in the same directory as the
 configuration file.
 
 [Example configuration](example-nexx-wt3020.conf) for my [NEXX
 WT3020](https://wiki.openwrt.org/toh/nexx/wt3020) router, where I have an
-encrypted USB disk attached so I can use it as a simple NAS.
+encrypted USB disk attached so I can use it as a simple NAS with samba and ftp:
 
 ```
 # LEDE profile to use: NEXX WT3020
 LEDE_PROFILE=wt3020-8M
-
-# specify the URL where the builder can be downloaded. 
-LEDE_RELEASE=18.06.0
+LEDE_RELEASE=18.06.1
 LEDE_TARGET=ramips
 LEDE_SUBTARGET=mt7620
-LEDE_BUILDER_URL="https://downloads.openwrt.org/releases/$LEDE_RELEASE/targets/$LEDE_TARGET/$LEDE_SUBTARGET/openwrt-imagebuilder-$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET.Linux-x86_64.tar.xz" 
 
 # list packages to include in LEDE image. prepend packages to deinstall with "-".
 LEDE_PACKAGES="samba36-server kmod-usb-storage kmod-scsi-core kmod-fs-ext4 ntfs-3g\
@@ -134,8 +134,6 @@ LEDE_PACKAGES="samba36-server kmod-usb-storage kmod-scsi-core kmod-fs-ext4 ntfs-
     kmod-crypto-misc kmod-crypto-cbc kmod-crypto-crc32c kmod-crypto-hash\
     kmod-crypto-user iwinfo tcpdump\
     -ppp -kmod-ppp -kmod-pppoe -kmod-pppox -ppp-mod-pppoe"
-
-# optionally override OUTPUT_DIR and ROOTFS_OVERLAY directory location here
 
 ```
 
@@ -211,7 +209,9 @@ To build an example run `./builder.sh build <config-file>`, e.g.
 $ ./builder.sh build example-rpi2.conf 
 ```
 
-The resulting image can be found in the `output/` directory.
+The resulting image can be found in the `output/` directory. The [OpenWRT
+wiki](https://openwrt.org/docs/guide-user/installation/generic.sysupgrade)
+describes how to flash the new image in detail.
 
 ## Author
 

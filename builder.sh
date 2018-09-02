@@ -12,14 +12,14 @@ SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 OUTPUT_DIR=$SCRIPT_DIR/output
 ROOTFS_OVERLAY=$SCRIPT_DIR/rootfs-overlay
 
-function usage_and_exit {
+function usage {
     cat<<EOT
 Dockerized LEDE/OpenWRT image builder.
 
 Usage: $1 COMMAND CONFIGFILE [OPTIONS] 
   COMMAND is one of:
     build-docker-image- just build the docker image
-    build             - build docker image, then start container and build the LEDE image
+    build             - build docker image, then start container and build the LEDE/OpenWRT image
     shell             - start shell in docker container
   CONFIGFILE          - configuraton file to use
 
@@ -54,7 +54,6 @@ function run_cmd_in_container {
 
 # run the builder in the container.
 function build_lede_image {
-	mkdir -p "$OUTPUT_DIR"
     echo "building image for $LEDE_PROFILE ..."
     run_cmd_in_container  make image PROFILE="$LEDE_PROFILE" \
 				PACKAGES="$LEDE_PACKAGES" \
@@ -74,7 +73,8 @@ function fail {
 }
 
 if [ $# -lt 2 ]; then
-    usage_and_exit "$0"
+    usage "$0"
+    exit 1
 fi
 
 COMMAND=$1; shift
@@ -99,17 +99,24 @@ while [[ $# -ge 1 ]]; do
     shift
 done
 
+mkdir -p "$OUTPUT_DIR"
 [ ! -d "$OUTPUT_DIR" ] && fail "output-dir: no such directory $OUTPUT_DIR"
 [ ! -d "$ROOTFS_OVERLAY" ] && fail "rootfs-overlay: no such directory $ROOTFS_OVERLAY"
 
+# set default LEDE_BUILDER_URL if not overriden in configuration file
+if [ -z "${LEDE_BUILDER_URL+x}" ]; then
+    LEDE_BUILDER_URL="https://downloads.openwrt.org/releases/$LEDE_RELEASE/targets/$LEDE_TARGET/$LEDE_SUBTARGET/openwrt-imagebuilder-$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET.Linux-x86_64.tar.xz" 
+fi
+
 IMAGE_TAG=$IMAGE_TAG:$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET 
+
 cat<<EOT
 --- configuration ------------------------------
-LEDE_RELEASE......: $LEDE_RELEASE
-LEDE_TARGET.......: $LEDE_TARGET
-LEDE_SUBTARGET....: $LEDE_SUBTARGET
-LEDE_PROFILE......: $LEDE_PROFILE
-LEDE_BUILDER_URL..: $LEDE_BUILDER_URL
+RELEASE...........: $LEDE_RELEASE
+TARGET............: $LEDE_TARGET
+SUBTARGET.........: $LEDE_SUBTARGET
+PROFILE...........: $LEDE_PROFILE
+BUILDER_URL.......: $LEDE_BUILDER_URL
 DOCKER_IMAGE_TAG..: $IMAGE_TAG
 OUTPUT_DIR........: $OUTPUT_DIR
 ROOTFS_OVERLAY....: $ROOTFS_OVERLAY
@@ -124,6 +131,6 @@ case $COMMAND in
          build_docker_image  ;;
      shell) 
          run_shell ;;
-     *) usage_and_exit "$0"
+     *) usage "$0"; exit 0 ;;
 esac
 
