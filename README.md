@@ -25,7 +25,7 @@ Easily and quickly build OpenWRT custom images using a self-contained
 docker container and the
 [OpenWrt](https://wiki.openwrt.org/doc/howto/obtain.firmware.generate) image
 builder. On the builder host, Docker is the only requirement. Supports latest
-OpenWRT release (18.06).
+OpenWRT release (18.06.x).
 
 ### Note
 
@@ -134,7 +134,6 @@ LEDE_PACKAGES="samba36-server kmod-usb-storage kmod-scsi-core kmod-fs-ext4 ntfs-
     kmod-crypto-misc kmod-crypto-cbc kmod-crypto-crc32c kmod-crypto-hash\
     kmod-crypto-user iwinfo tcpdump\
     -ppp -kmod-ppp -kmod-pppoe -kmod-pppox -ppp-mod-pppoe"
-
 ```
 
 ### File system overlay
