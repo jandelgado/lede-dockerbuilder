@@ -14,6 +14,7 @@
     * [Example directory structure](#example-directory-structure)
         * [Debugging](#debugging)
 * [Examples](#examples)
+* [Building an OpenWRT snapshot release](#building-an-openwrt-snapshot-release)
 * [Author](#author)
 * [License](#license)
 
@@ -211,6 +212,17 @@ $ ./builder.sh build example-rpi2.conf
 The resulting image can be found in the `output/` directory. The [OpenWRT
 wiki](https://openwrt.org/docs/guide-user/installation/generic.sysupgrade)
 describes how to flash the new image in detail.
+
+## Building an OpenWRT snapshot release
+
+To build a [snapshot](https://downloads.openwrt.org/snapshots) release, set
+`LEDE_RELEASE` to `snapshots` and let `LEDE_BUILDER_URL` point to the image
+builder in the snapshot dir, e.g.
+
+```
+LEDE_RELEASE=snapshots
+LEDE_BUILDER_URL="https://downloads.openwrt.org/$LEDE_RELEASE/targets/$LEDE_TARGET/$LEDE_SUBTARGET/openwrt-imagebuilder-$LEDE_TARGET-$LEDE_SUBTARGET.Linux-x86_64.tar.xz" 
+```
 
 ## Author
 
