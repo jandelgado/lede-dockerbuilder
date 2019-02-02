@@ -1,5 +1,10 @@
 # Changelog for lede-dockerbuilder
 
+## v1.3 [2019-02-02]
+
+* bumped version to OpenWRT 18.06.2
+* new x86_64 example with info on how to run in qemu
+
 ## v1.2 [2018-09-01]
 
 * `LEDE_BUILDER_URL` is now an optional parameter

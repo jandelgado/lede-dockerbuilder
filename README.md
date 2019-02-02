@@ -14,6 +14,7 @@
     * [Example directory structure](#example-directory-structure)
         * [Debugging](#debugging)
 * [Examples](#examples)
+    * [Building a x86_64 image and running it in qemu](#building-a-x86_64-image-and-running-it-in-qemu)
 * [Building an OpenWRT snapshot release](#building-an-openwrt-snapshot-release)
 * [Author](#author)
 * [License](#license)
@@ -212,6 +213,39 @@ $ ./builder.sh build example-rpi2.conf
 The resulting image can be found in the `output/` directory. The [OpenWRT
 wiki](https://openwrt.org/docs/guide-user/installation/generic.sysupgrade)
 describes how to flash the new image in detail.
+
+### Building a x86_64 image and running it in qemu
+
+The [example-x86_64.conf](example-x86_64.conf) file can be used to build a
+x86_64 based OpenWRT image which can also be run in qemu, e.g. if you need
+a virtual router/firewall.
+
+First build the image with `builder.sh build example-x86_64.conf`, then unpack
+the resulting image with `gunzip output/openwrt-18.06.2-x86-64-combined-ext4.img.gz`.
+Now the image can be started with qemu:
+
+```
+qemu-system-x86_64 \
+    -enable-kvm \
+    -nographic \
+    -device ide-hd,drive=d0,bus=ide.0 \
+    -drive file=output/openwrt-18.06.2-x86-64-combined-ext4.img,id=d0,if=none  \
+    -netdev user,id=hn0 \
+    -device virtio-net-pci,netdev=hn0,id=wan \
+    -netdev user,id=hn1,hostfwd=tcp::5555-:22001 \
+    -device virtio-net-pci,netdev=hn1,id=lan 
+```
+
+The `hostfwd=...` part can be omitted and is used in case you redirect port
+22001 on your WAN adapter to port 22 of the LAN adapter, in case you want to
+access SSH in the VM from your qemu-host. Check the `/etc/config/firewall` file
+for details.
+
+Qemu will assign the IP address `10.0.2.15/24` to the `WAN` interface (`eth1`)
+and OpenWRT the address `192.168.1.1/24` to the `LAN` (`br-lan` bridge with
+`eth0`) interface.
+
+Note: press `CTRL-A X` to exit qemu.
 
 ## Building an OpenWRT snapshot release
 
