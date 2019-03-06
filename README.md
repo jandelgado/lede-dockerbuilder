@@ -82,12 +82,13 @@ Example:
 ### Configuration file
 
 The configuration file is quiet self-explanatory. The following parameters are
-mandatory:
+mandatory (prefixed with `LEDE_` for historical reasons, config works also
+with OpenWrt):
 
 * `LEDE_TARGET` - Target architecture
 * `LEDE_SUBTARGET` - Sub target architecture
-* `LEDE_RELEASE` - LEDE release to use
-* `LEDE_PROFILE` - LEDE profile to use
+* `LEDE_RELEASE` - Release to use
+* `LEDE_PROFILE` - Profile to use
 * `LEDE_PACKAGES` - list of packages to include/exclude. Prepend package to be excluded with `-`.
 
 `LEDE_TARGET`, `LEDE_SUBTARGET` and `LEDE_RELEASE` are used to construct the
@@ -123,7 +124,7 @@ WT3020](https://wiki.openwrt.org/toh/nexx/wt3020) router, where I have an
 encrypted USB disk attached so I can use it as a simple NAS with samba and ftp:
 
 ```
-# LEDE profile to use: NEXX WT3020
+# profile to use: NEXX WT3020
 LEDE_PROFILE=wt3020-8M
 LEDE_RELEASE=18.06.1
 LEDE_TARGET=ramips
