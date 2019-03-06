@@ -1,4 +1,4 @@
-# Dockerized OpenWRT image builder
+# Dockerized OpenWrt image builder
 
 [![Build Status](https://travis-ci.org/jandelgado/lede-dockerbuilder.svg?branch=master)](https://travis-ci.org/jandelgado/lede-dockerbuilder)
 
@@ -15,7 +15,7 @@
         * [Debugging](#debugging)
 * [Examples](#examples)
     * [Building a x86_64 image and running it in qemu](#building-a-x86_64-image-and-running-it-in-qemu)
-* [Building an OpenWRT snapshot release](#building-an-openwrt-snapshot-release)
+* [Building an OpenWrt snapshot release](#building-an-openwrt-snapshot-release)
 * [Author](#author)
 * [License](#license)
 
@@ -23,17 +23,17 @@
 
 ## What
 
-Easily and quickly build OpenWRT custom images using a self-contained
+Easily and quickly build OpenWrt custom images using a self-contained
 docker container and the
 [OpenWrt](https://wiki.openwrt.org/doc/howto/obtain.firmware.generate) image
 builder. On the builder host, Docker is the only requirement. Supports latest
-OpenWRT release (18.06.x).
+OpenWrt release (18.06.x).
 
 ### Note
 
-The OpenWRT-dockerbuilder uses pre-compiled packages to build the final image. 
+The OpenWrt-dockerbuilder uses pre-compiled packages to build the final image. 
 Look [here](https://github.com/jandelgado/lede-dockercompiler) if you are looking 
-for a docker images to compile OpenWRT completely from source.
+for a docker images to compile OpenWrt completely from source.
 
 ## Why
 
@@ -54,17 +54,17 @@ Your custom images can now be found in the `output` diretory.
 The `build` command will first build the docker image containing the actual image
 builder. The resulting docker image is per default tagged with
 `openwrt-imagebuilder:<Release>-<Target>-<Subtarget>`.  Afterwards a container,
-which builds the actual OpenWRT image, is run. The final OpenWRT image will be
+which builds the actual OpenWrt image, is run. The final OpenWrt image will be
 available in the `output/` directory.
 
 ### Usage
 ```
-Dockerized LEDE/OpenWRT image builder.
+Dockerized LEDE/OpenWrt image builder.
 
 Usage: ./builder.sh COMMAND CONFIGFILE [OPTIONS] 
   COMMAND is one of:
     build-docker-image- just build the docker image
-    build             - build docker image, then start container and build the LEDE/OpenWRT image
+    build             - build docker image, then start container and build the LEDE/OpenWrt image
     shell             - start shell in docker container
   CONFIGFILE          - configuraton file to use
 
@@ -94,7 +94,7 @@ mandatory:
 URL of the image builder binary well as for the construction for the tag of the
 docker image.
 
-You can find the proper values (for 18.06) by browsing the OpenWRT website
+You can find the proper values (for 18.06) by browsing the OpenWrt website
 [here](https://downloads.openwrt.org/releases/18.06.0/targets/)  and
 [here](https://lede-project.org/toh/views/toh_admin_fw-pkg-download).
 
@@ -107,7 +107,7 @@ output and image creation:
 * `ROOTFS_OVERLAY` - path of the root file system overlay directory. Defaults
   to `rootfs-overlay` in the scripts directory (can be overridden by -f
   parameter).
-* `LEDE_BUILDER_URL` - URL of the LEDE/OpenWRT image builder to use, override
+* `LEDE_BUILDER_URL` - URL of the LEDE/OpenWrt image builder to use, override
    if you do not wish to use the default builder
    (`https://downloads.openwrt.org/releases/$LEDE_RELEASE/targets/$LEDE_TARGET/$LEDE_SUBTARGET/openwrt-imagebuilder-$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET.Linux-x86_64.tar.xz`)
 
@@ -147,7 +147,7 @@ the resulting image to the directory pointed to by `ROOTFS_OVERLAY` (default:
 ### Example directory structure
 
 The following is an example directoy layout, which I use to create a customized
-OpenWRT image for my [NEXX WT3020](https://wiki.openwrt.org/toh/nexx/wt3020)
+OpenWrt image for my [NEXX WT3020](https://wiki.openwrt.org/toh/nexx/wt3020)
 router (including the generated output).
 
 ```
@@ -210,14 +210,14 @@ To build an example run `./builder.sh build <config-file>`, e.g.
 $ ./builder.sh build example-rpi2.conf 
 ```
 
-The resulting image can be found in the `output/` directory. The [OpenWRT
+The resulting image can be found in the `output/` directory. The [OpenWrt
 wiki](https://openwrt.org/docs/guide-user/installation/generic.sysupgrade)
 describes how to flash the new image in detail.
 
 ### Building a x86_64 image and running it in qemu
 
 The [example-x86_64.conf](example-x86_64.conf) file can be used to build a
-x86_64 based OpenWRT image which can also be run in qemu, e.g. if you need
+x86_64 based OpenWrt image which can also be run in qemu, e.g. if you need
 a virtual router/firewall.
 
 First build the image with `builder.sh build example-x86_64.conf`, then unpack
@@ -242,12 +242,12 @@ access SSH in the VM from your qemu-host. Check the `/etc/config/firewall` file
 for details.
 
 Qemu will assign the IP address `10.0.2.15/24` to the `WAN` interface (`eth1`)
-and OpenWRT the address `192.168.1.1/24` to the `LAN` (`br-lan` bridge with
+and OpenWrt the address `192.168.1.1/24` to the `LAN` (`br-lan` bridge with
 `eth0`) interface.
 
 Note: press `CTRL-A X` to exit qemu.
 
-## Building an OpenWRT snapshot release
+## Building an OpenWrt snapshot release
 
 To build a [snapshot](https://downloads.openwrt.org/snapshots) release, set
 `LEDE_RELEASE` to `snapshots` and let `LEDE_BUILDER_URL` point to the image
