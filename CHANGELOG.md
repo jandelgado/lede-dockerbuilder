@@ -1,5 +1,10 @@
 # Changelog for lede-dockerbuilder
 
+## v1.4 [2019-03-29]
+
+* build container now uses Alpine 3.9 as base image
+* examples upgraded to use 18.06.2 
+
 ## v1.3 [2019-02-02]
 
 * bumped version to OpenWRT 18.06.2
