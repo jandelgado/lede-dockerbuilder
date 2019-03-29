@@ -10,7 +10,7 @@ if [ "$GOSU_USER" != "0:0" ]; then
       sed -i "/^builder:/d" /etc/passwd
     fi
     echo "builder:x:$GOSU_USER:LEDE builder:/lede:/bin/bash" >> /etc/passwd
-    exec gosu $GOSU_USER "$@"
+    exec /usr/local/bin/gosu $GOSU_USER "$@"
 fi
 
 # If GOSU_USER was 0:0 exec command passed in args without gosu (assume already root)

@@ -1,21 +1,13 @@
-FROM debian:8 
+FROM gliderlabs/alpine:3.9
 LABEL maintainer "Jan Delgado <jdelgado@gmx.net>"
 
 
-RUN echo "deb http://ftp.debian.org/debian jessie-backports main" >> /etc/apt/sources.list \
-    && apt-get update \
-    && apt-get -t jessie-backports install "gosu" \
-    && apt-get install -y --no-install-recommends ca-certificates wget  \
-                  subversion build-essential libncurses5-dev zlib1g-dev \
-                  gawk git ccache gettext libssl-dev xsltproc file unzip \
-                  python time \
-    && apt-get autoclean \
-    && apt-get clean \
-    && apt-get autoremove\
-    && rm -rf /var/lib/apt/lists/*
+RUN  apk add --update asciidoc bash bc binutils bzip2 cdrkit coreutils diffutils findutils flex g++ gawk gcc gettext git grep intltool libxslt linux-headers make ncurses-dev patch perl python2-dev tar unzip  util-linux wget zlib-dev xz\
+     && rm -rf /var/cache/apk/*
 
+ADD https://github.com/tianon/gosu/releases/download/1.11/gosu-amd64 /usr/local/bin/gosu
 ADD etc/entrypoint.sh /usr/local/bin/
-RUN chmod 755 /usr/local/bin/entrypoint.sh 
+RUN chmod 755 /usr/local/bin/entrypoint.sh /usr/local/bin/gosu
 
 # install the image builder. use tmpfile so that tar's compression
 # autodetection works.
