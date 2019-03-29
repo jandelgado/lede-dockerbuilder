@@ -28,7 +28,7 @@ Usage: $1 COMMAND CONFIGFILE [OPTIONS]
   -f ROOTFS_OVERLAY   - rootfs-overlay directory (default $ROOTFS_OVERLAY)
   --skip-sudo         - call docker directly, without sudo
 
-  command line options -o, -f, -r override config file settings.
+  command line options -o, -f override config file settings.
 
 Example:
   ./builder.sh build example.cfg -o output -f myrootfs
