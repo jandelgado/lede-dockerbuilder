@@ -73,7 +73,7 @@ Usage: ./builder.sh COMMAND CONFIGFILE [OPTIONS]
   -f ROOTFS_OVERLAY   - rootfs-overlay directory 
   --skip-sudo         - call docker directly, without sudo
 
-  command line options -o, -f, -r override config file settings.
+  command line options -o, -f override config file settings.
 
 Example:
   ./builder.sh build example.cfg -o output -f myrootfs
@@ -126,7 +126,7 @@ encrypted USB disk attached so I can use it as a simple NAS with samba and ftp:
 ```
 # profile to use: NEXX WT3020
 LEDE_PROFILE=wt3020-8M
-LEDE_RELEASE=18.06.1
+LEDE_RELEASE=18.06.2
 LEDE_TARGET=ramips
 LEDE_SUBTARGET=mt7620
 
