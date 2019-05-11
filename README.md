@@ -23,8 +23,8 @@
 
 ## What
 
-Easily and quickly build OpenWrt custom images using a self-contained
-docker container and the
+Easily and quickly build OpenWrt custom images (e.g. for your embedded device our Raspberry PI) 
+using a self-contained docker container and the
 [OpenWrt](https://wiki.openwrt.org/doc/howto/obtain.firmware.generate) image
 builder. On the builder host, Docker is the only requirement. Supports latest
 OpenWrt release (18.06.x).
