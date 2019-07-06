@@ -1,5 +1,9 @@
 # Changelog for lede-dockerbuilder
 
+## v1.5 [2019-07-06]
+
+* examples upgraded to use 18.06.4
+
 ## v1.4 [2019-03-29]
 
 * build container now uses Alpine 3.9 as base image
