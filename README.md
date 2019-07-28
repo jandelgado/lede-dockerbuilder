@@ -1,4 +1,4 @@
-# Dockerized OpenWrt image builder
+# Containerized OpenWrt image builder
 
 [![Build Status](https://travis-ci.org/jandelgado/lede-dockerbuilder.svg?branch=master)](https://travis-ci.org/jandelgado/lede-dockerbuilder)
 
@@ -9,6 +9,7 @@
 * [Why](#why)
 * [How](#how)
     * [Usage](#usage)
+        * [Dockerless operation](#dockerless-operation)
     * [Configuration file](#configuration-file)
     * [File system overlay](#file-system-overlay)
     * [Example directory structure](#example-directory-structure)
@@ -23,11 +24,11 @@
 
 ## What
 
-Easily and quickly build OpenWrt custom images (e.g. for your embedded device our Raspberry PI) 
-using a self-contained docker container and the
+Easily and quickly build OpenWrt custom images (e.g. for your embedded device
+our Raspberry PI) using a self-contained docker container and the
 [OpenWrt](https://wiki.openwrt.org/doc/howto/obtain.firmware.generate) image
-builder. On the builder host, Docker is the only requirement. Supports latest
-OpenWrt release (18.06.x).
+builder. On the builder host, Docker or podman/buildah (for dockerless
+operation) is the only requirement. Supports latest OpenWrt release (18.06.4).
 
 ### Note
 
@@ -47,37 +48,44 @@ for a docker images to compile OpenWrt completely from source.
 ```
 $ git clone https://github.com/jandelgado/lede-dockerbuilder.git
 $ cd lede-dockerbuilder
+$ ./builder.sh build-docker-image example-nexx-wt3020.conf
 $ ./builder.sh build example-nexx-wt3020.conf
 ```
-Your custom images can now be found in the `output` diretory.
 
-The `build` command will first build the docker image containing the actual image
-builder. The resulting docker image is per default tagged with
-`openwrt-imagebuilder:<Release>-<Target>-<Subtarget>`.  Afterwards a container,
-which builds the actual OpenWrt image, is run. The final OpenWrt image will be
-available in the `output/` directory.
+The `build-docker-image` command will first build the docker image containing
+the actual image builder. The resulting docker image is per default tagged with
+`openwrt-imagebuilder:<Release>-<Target>-<Subtarget>`.  The `build` command
+will afterwards run a container, which builds the actual OpenWrt image. The
+final OpenWrt image will be available in the `output/` directory.
 
 ### Usage
+
 ```
-Dockerized LEDE/OpenWrt image builder.
+Dockerized LEDE/OpenWRT image builder.
 
 Usage: ./builder.sh COMMAND CONFIGFILE [OPTIONS] 
   COMMAND is one of:
-    build-docker-image- just build the docker image
-    build             - build docker image, then start container and build the LEDE/OpenWrt image
+    build-docker-image- build the docker image (run once first)
+    build             - start container and build the LEDE/OpenWRT image
     shell             - start shell in docker container
   CONFIGFILE          - configuraton file to use
 
   OPTIONS:
-  -o OUTPUT_DIR       - output directory 
-  -f ROOTFS_OVERLAY   - rootfs-overlay directory 
+  -o OUTPUT_DIR       - output directory (default /home/paco/src/lede-dockerbuilder/output)
+  -f ROOTFS_OVERLAY   - rootfs-overlay directory (default /home/paco/src/lede-dockerbuilder/rootfs-overlay)
   --skip-sudo         - call docker directly, without sudo
+  --dockerless        - use podman and buildah instead of docker daemon
 
   command line options -o, -f override config file settings.
 
 Example:
   ./builder.sh build example.cfg -o output -f myrootfs
 ```
+
+#### Dockerless operation
+
+When called with `--dockerless` option, lede-dockerbuilder will use buildah and 
+podman to build and run the container.
 
 ### Configuration file
 

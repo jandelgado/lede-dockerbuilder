@@ -1,5 +1,5 @@
 #!/bin/bash
-# A Docker based OpenWRT image builder.
+# A container based OpenWRT image builder.
 # (c) Jan Delgado 02-2017
 
 set -e
@@ -18,8 +18,8 @@ Dockerized LEDE/OpenWRT image builder.
 
 Usage: $1 COMMAND CONFIGFILE [OPTIONS] 
   COMMAND is one of:
-    build-docker-image- just build the docker image
-    build             - build docker image, then start container and build the LEDE/OpenWRT image
+    build-docker-image- build the docker image (run once first)
+    build             - start container and build the LEDE/OpenWRT image
     shell             - start shell in docker container
   CONFIGFILE          - configuraton file to use
 
@@ -27,6 +27,7 @@ Usage: $1 COMMAND CONFIGFILE [OPTIONS]
   -o OUTPUT_DIR       - output directory (default $OUTPUT_DIR)
   -f ROOTFS_OVERLAY   - rootfs-overlay directory (default $ROOTFS_OVERLAY)
   --skip-sudo         - call docker directly, without sudo
+  --dockerless        - use podman and buildah instead of docker daemon
 
   command line options -o, -f override config file settings.
 
@@ -39,17 +40,20 @@ EOT
 # build container and pass in the actual builder to use
 function build_docker_image  {
     echo "building docker image $IMAGE_TAG ..."
-	$SUDO docker build --build-arg BUILDER_URL="$LEDE_BUILDER_URL" \
-                      -t $IMAGE_TAG docker
+	# shellcheck disable=2086
+	$SUDO $DOCKER_BUILD\
+        --build-arg BUILDER_URL="$LEDE_BUILDER_URL" -t "$IMAGE_TAG" docker
 }
 
 function run_cmd_in_container {
-	$SUDO docker run \
-			--rm \
-            -e GOSU_USER="$(id -ur):$(id -g)" \
-            -v "$(cd "$ROOTFS_OVERLAY"; pwd)":/lede/rootfs-overlay:z \
-            -v "$(cd "$OUTPUT_DIR"; pwd)":/lede/output:z \
-			-ti --rm "$IMAGE_TAG" "$@"
+	# shellcheck disable=2086
+	$SUDO $DOCKER_RUN\
+        --rm\
+        -e GOSU_UID="$(id -ur)" \
+        -e GOSU_GID="$(id -g)" \
+        -v "$(cd "$ROOTFS_OVERLAY"; pwd)":/lede/rootfs-overlay:z \
+        -v "$(cd "$OUTPUT_DIR"; pwd)":/lede/output:z \
+        -ti --rm "$IMAGE_TAG" "$@"
 }
 
 # run the builder in the container.
@@ -80,6 +84,8 @@ fi
 COMMAND=$1; shift
 CONFIG_FILE=$1; shift
 SUDO=sudo
+DOCKER_BUILD="docker build"
+DOCKER_RUN="docker run"
 
 # pull in config file, making $BASEDIR_CONFIG_FILE available inside`
 [ ! -f "$CONFIG_FILE" ] && fail "can not open $CONFIG_FILE"
@@ -94,6 +100,7 @@ while [[ $# -ge 1 ]]; do
         -f) ROOTFS_OVERLAY="$2"; shift ;;
         -o) OUTPUT_DIR="$2"; shift ;;
         --skip-sudo) SUDO="" ;;
+        --dockerless) SUDO=""; DOCKER_BUILD="buildah bud"; DOCKER_RUN="podman run" ;;
         *) fail "invalid option: $key";;
     esac
     shift
@@ -120,12 +127,12 @@ BUILDER_URL.......: $LEDE_BUILDER_URL
 DOCKER_IMAGE_TAG..: $IMAGE_TAG
 OUTPUT_DIR........: $OUTPUT_DIR
 ROOTFS_OVERLAY....: $ROOTFS_OVERLAY
+CONTAINER ENGINE..: $(echo "$DOCKER_RUN" | cut -d " " -f1)
 ------------------------------------------------
 EOT
 
 case $COMMAND in
      build) 
-         build_docker_image  
          build_lede_image  ;;
      build-docker-image) 
          build_docker_image  ;;

@@ -18,4 +18,4 @@ jobs:
     - stage: check examples
       script:
         - mkdir -p output
-        - for f in *.conf; do ./builder.sh build $f; done
+        - for f in *.conf; do ./builder.sh build-docker-image $f && ./builder.sh build $f; done
