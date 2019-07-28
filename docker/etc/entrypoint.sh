@@ -1,18 +1,18 @@
 #!/bin/sh
 
-chown -R $GOSU_USER /lede
+chown -R "$GOSU_UID:$GOSU_GID" /lede
 
-# If GOSU_USER environment variable set to something other than 0:0 (root:root),
+# If GOSU_UID:GOSU_GID environment variable set to something other than 0:0 (root:root),
 # become user:group set within and exec command passed in args
-if [ "$GOSU_USER" != "0:0" ]; then
+if [ "$GOSU_UID:$GOSU_GID" != "0:0" ]; then
     # make sure a valid user exists in /etc/passwd
-    if grep "^builder:" /etc/passwd; then
-      sed -i "/^builder:/d" /etc/passwd
-    fi
-    echo "builder:x:$GOSU_USER:LEDE builder:/lede:/bin/bash" >> /etc/passwd
-    exec /usr/local/bin/gosu $GOSU_USER "$@"
+    sed -i "/^builder:/d" /etc/passwd || true
+    echo "builder:x:$GOSU_UID:$GOSU_GID:LEDE builder:/lede:/bin/bash" >> /etc/passwd
+    sed -i "/^builder:/d" /etc/group || true
+    echo "builder:x:$GOSU_GID" >> /etc/group
+    exec gosu "$GOSU_UID:$GOSU_GID" "$@"
 fi
 
-# If GOSU_USER was 0:0 exec command passed in args without gosu (assume already root)
+# If GOSU_UID:GOSU_GID was 0:0 exec command passed in args without gosu (assume already root)
 exec "$@"
 

@@ -1,5 +1,13 @@
 # Changelog for lede-dockerbuilder
 
+## v2.0 [2019-07-28]
+
+* add new option `--dockerless` to allow dockerless operation using buildah
+  and podman. 
+* `build` option does now longer implicitly builds the docker image. Must now
+  explicitly call `build-docker-image` before building an OpenWrt image.
+* minor optimizations in Dockerfile
+
 ## v1.5 [2019-07-06]
 
 * examples upgraded to use 18.06.4
