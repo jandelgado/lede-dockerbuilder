@@ -1,6 +1,6 @@
 #!/bin/bash
 # A container based OpenWRT image builder.
-# (c) Jan Delgado 02-2017
+# (c) Jan Delgado 2017-2019
 
 set -e
 
@@ -37,6 +37,11 @@ EOT
     exit 0
 }
 
+# return given file path as absolute path. path to file must exist.
+function abspath {
+    echo "$(cd "$(dirname "$1")"; pwd)/$(basename "$1")"
+}
+
 # build container and pass in the actual builder to use
 function build_docker_image  {
     echo "building docker image $IMAGE_TAG ..."
@@ -46,13 +51,21 @@ function build_docker_image  {
 }
 
 function run_cmd_in_container {
+    if [ -n "$REPOSITORIES_CONF" ]; then
+        conf="$(abspath "$REPOSITORIES_CONF")"
+        REPOSITORIES_VOLUME=(-v "$conf":/lede/imagebuilder/repositories.conf:z)
+    else
+        REPOSITORIES_VOLUME=()
+    fi
+
 	# shellcheck disable=2086
 	$SUDO $DOCKER_RUN\
         --rm\
         -e GOSU_UID="$(id -ur)" \
         -e GOSU_GID="$(id -g)" \
-        -v "$(cd "$ROOTFS_OVERLAY"; pwd)":/lede/rootfs-overlay:z \
-        -v "$(cd "$OUTPUT_DIR"; pwd)":/lede/output:z \
+        -v "$(abspath "$ROOTFS_OVERLAY")":/lede/rootfs-overlay:z \
+        -v "$(abspath "$OUTPUT_DIR")":/lede/output:z \
+        "${REPOSITORIES_VOLUME[@]}" \
         -ti --rm "$IMAGE_TAG" "$@"
 }
 
@@ -127,6 +140,7 @@ BUILDER_URL.......: $LEDE_BUILDER_URL
 DOCKER_IMAGE_TAG..: $IMAGE_TAG
 OUTPUT_DIR........: $OUTPUT_DIR
 ROOTFS_OVERLAY....: $ROOTFS_OVERLAY
+REPOSITORIES_CONF.: $REPOSITORIES_CONF
 CONTAINER ENGINE..: $(echo "$DOCKER_RUN" | cut -d " " -f1)
 ------------------------------------------------
 EOT
