@@ -113,7 +113,7 @@ while [[ $# -ge 1 ]]; do
         -f) ROOTFS_OVERLAY="$2"; shift ;;
         -o) OUTPUT_DIR="$2"; shift ;;
         --skip-sudo) SUDO="" ;;
-        --dockerless) SUDO=""; DOCKER_BUILD="buildah bud"; DOCKER_RUN="podman run" ;;
+        --dockerless) SUDO=""; DOCKER_BUILD="buildah bud --layers=true"; DOCKER_RUN="podman run" ;;
         *) fail "invalid option: $key";;
     esac
     shift
