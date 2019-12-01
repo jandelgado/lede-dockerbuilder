@@ -10,7 +10,7 @@ if [ "$GOSU_UID:$GOSU_GID" != "0:0" ]; then
     echo "builder:x:$GOSU_UID:$GOSU_GID:LEDE builder:/lede:/bin/bash" >> /etc/passwd
     sed -i "/^builder:/d" /etc/group || true
     echo "builder:x:$GOSU_GID" >> /etc/group
-    exec gosu "$GOSU_UID:$GOSU_GID" "$@"
+    exec su-exec "$GOSU_UID:$GOSU_GID" "$@"
 fi
 
 # If GOSU_UID:GOSU_GID was 0:0 exec command passed in args without gosu (assume already root)
