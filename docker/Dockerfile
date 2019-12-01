@@ -5,7 +5,7 @@ RUN  apk add --update asciidoc bash bc binutils bzip2 cdrkit coreutils\
                       diffutils findutils flex g++ gawk gcc gettext git grep\
                       intltool libxslt linux-headers make ncurses-dev patch\
                       perl python2-dev tar unzip  util-linux wget zlib-dev xz\
-     && apk add --update gosu --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing \
+                      su-exec\
      && rm -rf /var/cache/apk/*
 
 ADD etc/entrypoint.sh /usr/local/bin/
