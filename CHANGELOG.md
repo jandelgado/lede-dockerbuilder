@@ -1,5 +1,11 @@
 # Changelog for lede-dockerbuilder
 
+## v2.1 [2019-12-01]
+
+* new environment variable `REPOSITORIES_CONF` added to specify custom
+  `repositories.conf` file
+* replace `gosu` by `su-exec`
+
 ## v2.0 [2019-07-28]
 
 * add new option `--dockerless` to allow dockerless operation using buildah
