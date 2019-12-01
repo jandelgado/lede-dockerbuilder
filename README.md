@@ -119,6 +119,10 @@ output and image creation:
 * `LEDE_BUILDER_URL` - URL of the LEDE/OpenWrt image builder to use, override
    if you do not wish to use the default builder
    (`https://downloads.openwrt.org/releases/$LEDE_RELEASE/targets/$LEDE_TARGET/$LEDE_SUBTARGET/openwrt-imagebuilder-$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET.Linux-x86_64.tar.xz`)
+* `REPOSITORIES_CONF` - optional file file to use instead of the default
+  `repositories.conf`. The file will be mounted in the container.
+  Look at the [official documentation](https://openwrt.org/docs/guide-user/additional-software/imagebuilder#add_package_repositories_optional)
+  for more information.
 
 Use the `BASEDIR_CONFIG_FILE` variable to set locations of `OUTPUT_DIR` or
 `ROOTFS_OVERLAY` relative to the configuration files location. This allows
