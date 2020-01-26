@@ -97,7 +97,8 @@ with OpenWrt):
 * `LEDE_SUBTARGET` - Sub target architecture
 * `LEDE_RELEASE` - Release to use
 * `LEDE_PROFILE` - Profile to use
-* `LEDE_PACKAGES` - list of packages to include/exclude. Prepend package to be excluded with `-`.
+* `LEDE_PACKAGES` - list of packages to include/exclude. Prepend package to be excluded with `-`
+* `LEDE_DISABLED_SERVICES` - list of services to disable on startup in /etc/init.d
 
 `LEDE_TARGET`, `LEDE_SUBTARGET` and `LEDE_RELEASE` are used to construct the
 URL of the image builder binary well as for the construction for the tag of the

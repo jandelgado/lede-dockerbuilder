@@ -45,8 +45,8 @@ function abspath {
 # build container and pass in the actual builder to use
 function build_docker_image  {
     echo "building docker image $IMAGE_TAG ..."
-	# shellcheck disable=2086
-	$SUDO $DOCKER_BUILD\
+    # shellcheck disable=2086
+    $SUDO $DOCKER_BUILD\
         --build-arg BUILDER_URL="$LEDE_BUILDER_URL" -t "$IMAGE_TAG" docker
 }
 
@@ -58,8 +58,8 @@ function run_cmd_in_container {
         REPOSITORIES_VOLUME=()
     fi
 
-	# shellcheck disable=2086
-	$SUDO $DOCKER_RUN\
+    # shellcheck disable=2086
+    $SUDO $DOCKER_RUN\
         --rm\
         -e GOSU_UID="$(id -ur)" \
         -e GOSU_GID="$(id -g)" \
@@ -73,9 +73,10 @@ function run_cmd_in_container {
 function build_lede_image {
     echo "building image for $LEDE_PROFILE ..."
     run_cmd_in_container  make image PROFILE="$LEDE_PROFILE" \
-				PACKAGES="$LEDE_PACKAGES" \
-				FILES="/lede/rootfs-overlay" \
-				BIN_DIR="/lede/output"
+                PACKAGES="$LEDE_PACKAGES" \
+                DISABLED_SERVICES="$LEDE_DISABLED_SERVICES" \
+                FILES="/lede/rootfs-overlay" \
+                BIN_DIR="/lede/output"
 }
 
 # run a shell in the container, useful for debugging.
@@ -140,6 +141,7 @@ BUILDER_URL.......: $LEDE_BUILDER_URL
 DOCKER_IMAGE_TAG..: $IMAGE_TAG
 OUTPUT_DIR........: $OUTPUT_DIR
 ROOTFS_OVERLAY....: $ROOTFS_OVERLAY
+DISABLED_SERVICES.: $LEDE_DISABLED_SERVICES
 REPOSITORIES_CONF.: $REPOSITORIES_CONF
 CONTAINER ENGINE..: $(echo "$DOCKER_RUN" | cut -d " " -f1)
 ------------------------------------------------
