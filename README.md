@@ -26,9 +26,9 @@
 
 Easily and quickly build OpenWrt custom images (e.g. for your embedded device
 our Raspberry PI) using a self-contained docker container and the
-[OpenWrt](https://wiki.openwrt.org/doc/howto/obtain.firmware.generate) image
-builder. On the builder host, Docker or podman/buildah (for dockerless
-operation) is the only requirement. Supports latest OpenWrt release (18.06.4).
+[OpenWrt image builder](https://openwrt.org/docs/guide-user/additional-software/imagebuilder).
+On the builder host, Docker or podman/buildah (for dockerless
+operation) is the only requirement. Supports latest OpenWrt release (19.07.0).
 
 ### Note
 
@@ -138,7 +138,7 @@ encrypted USB disk attached so I can use it as a simple NAS with samba and ftp:
 ```
 # profile to use: NEXX WT3020
 LEDE_PROFILE=wt3020-8M
-LEDE_RELEASE=18.06.4
+LEDE_RELEASE=19.07.0
 LEDE_TARGET=ramips
 LEDE_SUBTARGET=mt7620
 
@@ -234,7 +234,7 @@ x86_64 based OpenWrt image which can also be run in qemu, e.g. if you need
 a virtual router/firewall.
 
 First build the image with `builder.sh build example-x86_64.conf`, then unpack
-the resulting image with `gunzip output/openwrt-18.06.2-x86-64-combined-ext4.img.gz`.
+the resulting image with `gunzip output/openwrt-19.07.0-x86-64-combined-ext4.img.gz`.
 Now the image can be started with qemu:
 
 ```
@@ -242,7 +242,7 @@ qemu-system-x86_64 \
     -enable-kvm \
     -nographic \
     -device ide-hd,drive=d0,bus=ide.0 \
-    -drive file=output/openwrt-18.06.2-x86-64-combined-ext4.img,id=d0,if=none  \
+    -drive file=output/openwrt-19.07.0-x86-64-combined-ext4.img,id=d0,if=none  \
     -netdev user,id=hn0 \
     -device virtio-net-pci,netdev=hn0,id=wan \
     -netdev user,id=hn1,hostfwd=tcp::5555-:22001 \

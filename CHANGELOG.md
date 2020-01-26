@@ -1,5 +1,9 @@
 # Changelog for lede-dockerbuilder
 
+## v2.2 [2020-01-24]
+
+* examples upgraded to use 19.07.0
+ 
 ## v2.1 [2019-12-01]
 
 * new environment variable `REPOSITORIES_CONF` added to specify custom
