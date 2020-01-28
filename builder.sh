@@ -16,7 +16,7 @@ function usage {
     cat<<EOT
 Dockerized LEDE/OpenWRT image builder.
 
-Usage: $1 COMMAND CONFIGFILE [OPTIONS] 
+Usage: $1 COMMAND CONFIGFILE [OPTIONS]
   COMMAND is one of:
     build-docker-image- build the docker image (run once first)
     build             - start container and build the LEDE/OpenWRT image
@@ -61,8 +61,6 @@ function run_cmd_in_container {
     # shellcheck disable=2086
     $SUDO $DOCKER_RUN\
         --rm\
-        -e GOSU_UID="$(id -ur)" \
-        -e GOSU_GID="$(id -g)" \
         -v "$(abspath "$ROOTFS_OVERLAY")":/lede/rootfs-overlay:z \
         -v "$(abspath "$OUTPUT_DIR")":/lede/output:z \
         "${REPOSITORIES_VOLUME[@]}" \
@@ -97,9 +95,11 @@ fi
 
 COMMAND=$1; shift
 CONFIG_FILE=$1; shift
+
+# default: use docker
 SUDO=sudo
 DOCKER_BUILD="docker build"
-DOCKER_RUN="docker run"
+DOCKER_RUN="docker run -e GOSU_UID=$(id -ur) -e GOSU_GID=$(id -g)"
 
 # pull in config file, making $BASEDIR_CONFIG_FILE available inside`
 [ ! -f "$CONFIG_FILE" ] && fail "can not open $CONFIG_FILE"
@@ -111,11 +111,18 @@ eval "$(cat "$CONFIG_FILE")"
 while [[ $# -ge 1 ]]; do
     key="$1"
     case $key in
-        -f) ROOTFS_OVERLAY="$2"; shift ;;
-        -o) OUTPUT_DIR="$2"; shift ;;
-        --skip-sudo) SUDO="" ;;
-        --dockerless) SUDO=""; DOCKER_BUILD="buildah bud --layers=true"; DOCKER_RUN="podman run" ;;
-        *) fail "invalid option: $key";;
+        -f)
+            ROOTFS_OVERLAY="$2"; shift ;;
+        -o)
+            OUTPUT_DIR="$2"; shift ;;
+        --skip-sudo)
+            SUDO="" ;;
+        --dockerless)
+            SUDO=""
+            DOCKER_BUILD="buildah bud --layers=true"
+            DOCKER_RUN="podman run" ;;
+        *)
+            fail "invalid option: $key";;
     esac
     shift
 done
@@ -126,10 +133,10 @@ mkdir -p "$OUTPUT_DIR"
 
 # set default LEDE_BUILDER_URL if not overriden in configuration file
 if [ -z "${LEDE_BUILDER_URL+x}" ]; then
-    LEDE_BUILDER_URL="https://downloads.openwrt.org/releases/$LEDE_RELEASE/targets/$LEDE_TARGET/$LEDE_SUBTARGET/openwrt-imagebuilder-$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET.Linux-x86_64.tar.xz" 
+    LEDE_BUILDER_URL="https://downloads.openwrt.org/releases/$LEDE_RELEASE/targets/$LEDE_TARGET/$LEDE_SUBTARGET/openwrt-imagebuilder-$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET.Linux-x86_64.tar.xz"
 fi
 
-IMAGE_TAG=$IMAGE_TAG:$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET 
+IMAGE_TAG=$IMAGE_TAG:$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET
 
 cat<<EOT
 --- configuration ------------------------------
@@ -148,11 +155,11 @@ CONTAINER ENGINE..: $(echo "$DOCKER_RUN" | cut -d " " -f1)
 EOT
 
 case $COMMAND in
-     build) 
+     build)
          build_lede_image  ;;
-     build-docker-image) 
+     build-docker-image)
          build_docker_image  ;;
-     shell) 
+     shell)
          run_shell ;;
      *) usage "$0"; exit 0 ;;
 esac

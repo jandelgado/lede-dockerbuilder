@@ -1,5 +1,10 @@
 # Changelog for lede-dockerbuilder
 
+## v2.3 [2020-01-26]
+
+* changed: when using podman, run as root in container
+* new: optionally disable services in `/etc/init.d` with variable `LEDE_DISABLED_SERVICES`
+
 ## v2.2 [2020-01-24]
 
 * examples upgraded to use 19.07.0
