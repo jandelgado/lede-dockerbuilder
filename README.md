@@ -104,9 +104,9 @@ with OpenWrt):
 URL of the image builder binary well as for the construction for the tag of the
 docker image.
 
-You can find the proper values (for 18.06) by browsing the OpenWrt website
-[here](https://downloads.openwrt.org/releases/18.06.0/targets/)  and
-[here](https://lede-project.org/toh/views/toh_admin_fw-pkg-download).
+You can find the proper values by browsing the OpenWrt website e.g.
+[here](https://openwrt.org/docs/techref/targets/start)  and
+[here](https://openwrt.org/toh/views/toh_admin_fw-pkg-download).
 
 In addition the following optional parameters can be set, to further control
 output and image creation:
@@ -133,7 +133,7 @@ rootfs-overlay directory is expected to be in the same directory as the
 configuration file.
 
 [Example configuration](example-nexx-wt3020.conf) for my [NEXX
-WT3020](https://wiki.openwrt.org/toh/nexx/wt3020) router, where I have an
+WT3020](https://openwrt.org/toh/nexx/wt3020) router, where I have an
 encrypted USB disk attached so I can use it as a simple NAS with samba and ftp:
 
 ```
@@ -161,7 +161,7 @@ the resulting image to the directory pointed to by `ROOTFS_OVERLAY` (default:
 ### Example directory structure
 
 The following is an example directoy layout, which I use to create a customized
-OpenWrt image for my [NEXX WT3020](https://wiki.openwrt.org/toh/nexx/wt3020)
+OpenWrt image for my [NEXX WT3020](https://openwrt.org/toh/nexx/wt3020)
 router (including the generated output).
 
 ```
@@ -173,9 +173,9 @@ router (including the generated output).
 ├── example.cfg
 ├── example-openwrt.cfg
 ├── output
-│   ├── openwrt-18.06.0-ramips-mt7620-device-wt3020-8m.manifest
-│   ├── openwrt-18.06.0-ramips-mt7620-wt3020-8M-squashfs-factory.bin
-│   ├── openwrt-18.06.0-ramips-mt7620-wt3020-8M-squashfs-sysupgrade.bin
+│   ├── openwrt-xx.yy.z-ramips-mt7620-device-wt3020-8m.manifest
+│   ├── openwrt-xx.yy.z-ramips-mt7620-wt3020-8M-squashfs-factory.bin
+│   ├── openwrt-xx.yy.z-ramips-mt7620-wt3020-8M-squashfs-sysupgrade.bin
 │   └── sha256sums
 ├── README.md
 └── rootfs-overlay
