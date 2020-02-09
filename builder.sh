@@ -96,14 +96,6 @@ fi
 COMMAND=$1; shift
 CONFIG_FILE=$1; shift
 
-# if macos skip sudo
-$uname=[uname]
-
-if $uname=Darwin 
-then
-    sudo=""
-fi
-
 # default: use docker
 SUDO=sudo
 DOCKER_BUILD="docker build"
@@ -114,6 +106,15 @@ DOCKER_RUN="docker run -e GOSU_UID=$(id -ur) -e GOSU_GID=$(id -g)"
 # shellcheck disable=SC2034
 BASEDIR_CONFIG_FILE=$( cd "$( dirname "$CONFIG_FILE" )" && pwd )
 eval "$(cat "$CONFIG_FILE")"
+
+# if macos skip sudo
+UNAME=uname
+
+if [ `$UNAME` == "Darwin" ]
+then
+    SUDO=""
+fi
+
 
 # parse cli args, can override config file params
 while [[ $# -ge 1 ]]; do
