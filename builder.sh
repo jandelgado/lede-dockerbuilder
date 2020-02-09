@@ -108,10 +108,8 @@ BASEDIR_CONFIG_FILE=$( cd "$( dirname "$CONFIG_FILE" )" && pwd )
 eval "$(cat "$CONFIG_FILE")"
 
 # if macos skip sudo
-UNAME=uname
-
-if [ $(UNAME) == "Darwin" ]
-then
+UNAME=$(uname)
+if [ "$(UNAME)" == "Darwin" ]; then
     SUDO=""
 fi
 
