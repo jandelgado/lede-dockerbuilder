@@ -96,6 +96,14 @@ fi
 COMMAND=$1; shift
 CONFIG_FILE=$1; shift
 
+# if macos skip sudo
+$uname=[uname]
+
+if $uname=Darwin 
+then
+    sudo=""
+fi
+
 # default: use docker
 SUDO=sudo
 DOCKER_BUILD="docker build"
