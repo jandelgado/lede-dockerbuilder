@@ -109,7 +109,7 @@ eval "$(cat "$CONFIG_FILE")"
 
 # if macos skip sudo
 UNAME=$(uname)
-if [ "$(UNAME)" == "Darwin" ]; then
+if [ "$UNAME" == "Darwin" ]; then
     SUDO=""
 fi
 
