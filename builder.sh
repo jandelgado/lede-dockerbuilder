@@ -107,6 +107,13 @@ DOCKER_RUN="docker run -e GOSU_UID=$(id -ur) -e GOSU_GID=$(id -g)"
 BASEDIR_CONFIG_FILE=$( cd "$( dirname "$CONFIG_FILE" )" && pwd )
 eval "$(cat "$CONFIG_FILE")"
 
+# if macos skip sudo
+UNAME=$(uname)
+if [ "$UNAME" == "Darwin" ]; then
+    SUDO=""
+fi
+
+
 # parse cli args, can override config file params
 while [[ $# -ge 1 ]]; do
     key="$1"
