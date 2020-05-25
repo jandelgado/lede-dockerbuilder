@@ -51,6 +51,8 @@ function build_docker_image  {
 }
 
 function run_cmd_in_container {
+    local docker_term_opts="-ti"
+    [ ! -t 0 ] && docker_term_opts="-i"
     if [ -n "$REPOSITORIES_CONF" ]; then
         conf="$(abspath "$REPOSITORIES_CONF")"
         REPOSITORIES_VOLUME=(-v "$conf":/lede/imagebuilder/repositories.conf:z)
@@ -61,10 +63,11 @@ function run_cmd_in_container {
     # shellcheck disable=2086
     $SUDO $DOCKER_RUN\
         --rm\
+		$docker_term_opts \
         -v "$(abspath "$ROOTFS_OVERLAY")":/lede/rootfs-overlay:z \
         -v "$(abspath "$OUTPUT_DIR")":/lede/output:z \
         "${REPOSITORIES_VOLUME[@]}" \
-        -ti --rm "$IMAGE_TAG" "$@"
+        --rm "$IMAGE_TAG" "$@"
 }
 
 # run the builder in the container.
