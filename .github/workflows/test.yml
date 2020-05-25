@@ -1,0 +1,18 @@
+on: [pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: shellcheck
+        run: shellcheck builder.sh
+      - name: test build examples
+        run: |
+          mkdir -p output
+          for f in *.conf; do
+            ./builder.sh build-docker-image $f --skip-sudo && \
+              ./builder.sh build $f --skip-sudo
+          done
