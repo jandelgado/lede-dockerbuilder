@@ -1,5 +1,11 @@
 # Changelog for lede-dockerbuilder
 
+## v2.4 [2020-05-25]
+
+* new option `--docker-opts OPTS` to pass additional docker options to docker-run
+* examples upgraded to use OpenWrt 19.07.3
+* new Raspberry Pi 4 example
+
 ## v2.3 [2020-01-26]
 
 * changed: when using podman, run as root in container
