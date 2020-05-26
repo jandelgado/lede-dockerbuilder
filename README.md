@@ -61,6 +61,7 @@ final OpenWrt image will be available in the `output/` directory.
 ### Usage
 
 ```
+
 Dockerized LEDE/OpenWRT image builder.
 
 Usage: ./builder.sh COMMAND CONFIGFILE [OPTIONS]
@@ -145,7 +146,7 @@ encrypted USB disk attached so I can use it as a simple NAS with samba and ftp:
 ```
 # profile to use: NEXX WT3020
 LEDE_PROFILE=wt3020-8M
-LEDE_RELEASE=19.07.0
+LEDE_RELEASE=19.07.3
 LEDE_TARGET=ramips
 LEDE_SUBTARGET=mt7620
 
@@ -219,10 +220,15 @@ e.g. `./builder.sh shell example.cfg`.
 
 These examples evolved from images I use myself.
 
-* [minimal image with LUCI web GUI for the Raspberry PI 2](example-rpi2.conf). Just ~8MB gziped. I use this image on my home dnsmasq/openvpn 'server'.  
+* [image with LUCI web GUI for the Raspberry PI 2](example-rpi2.conf).
+  Just ~8MB gziped. I use this image on my home dnsmasq/openvpn 'server'.
+* [image with LUCI web GUI and adblocker for the Raspberry PI 4](example-rpi4.conf)
 * [image for the TP-Link WR1043ND](example-wrt1043nd.conf)
-* [image with samba, vsftpd and encrypted usb disk for NEXX-WT3020](example-nexx-wt3020.conf). Is the predessor of ...
-* [image with samba, vsftpd and encrypted usb disk for GINET-GL-M300N](example-ginet-gl-mt300n.conf). This is my travel router setup where I have an encrypted USB disk connected to the router.
+* [image with samba, vsftpd and encrypted usb disk for
+  NEXX-WT3020](example-nexx-wt3020.conf). Is the predessor of ...
+* [image with samba, vsftpd and encrypted usb disk for
+  GINET-GL-M300N](example-ginet-gl-mt300n.conf). This is my travel router setup
+  where I have an encrypted USB disk connected to the router.
 
 To build an example run `./builder.sh build <config-file>`, e.g.
 
@@ -241,7 +247,7 @@ x86_64 based OpenWrt image which can also be run in qemu, e.g. if you need
 a virtual router/firewall.
 
 First build the image with `builder.sh build example-x86_64.conf`, then unpack
-the resulting image with `gunzip output/openwrt-19.07.0-x86-64-combined-ext4.img.gz`.
+the resulting image with `gunzip output/openwrt-19.07.x-x86-64-combined-ext4.img.gz`.
 Now the image can be started with qemu:
 
 ```
@@ -277,6 +283,9 @@ builder in the snapshot dir, e.g.
 LEDE_RELEASE=snapshots
 LEDE_BUILDER_URL="https://downloads.openwrt.org/$LEDE_RELEASE/targets/$LEDE_TARGET/$LEDE_SUBTARGET/openwrt-imagebuilder-$LEDE_TARGET-$LEDE_SUBTARGET.Linux-x86_64.tar.xz" 
 ```
+
+See the [Raspberry Pi 4 example](example-rpi4.conf) which builds an image for
+the raspi 4, which is (as of may 2020) only available on the snapshots branch.
 
 ## Author
 
