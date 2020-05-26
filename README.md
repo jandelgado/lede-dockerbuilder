@@ -1,6 +1,6 @@
 # Containerized OpenWrt image builder
 
-[![Build Status](https://travis-ci.org/jandelgado/lede-dockerbuilder.svg?branch=master)](https://travis-ci.org/jandelgado/lede-dockerbuilder)
+![Build Status](https://github.com/jandelgado/lede-dockerbuilder/workflows/test/badge.svg)
 
 <!-- vim-markdown-toc GFM -->
 
