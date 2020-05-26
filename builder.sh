@@ -11,6 +11,7 @@ SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 # may be overridden in the config file
 OUTPUT_DIR=$SCRIPT_DIR/output
 ROOTFS_OVERLAY=$SCRIPT_DIR/rootfs-overlay
+PROG=$0
 
 function usage {
     cat<<EOT
@@ -25,6 +26,8 @@ Usage: $1 COMMAND CONFIGFILE [OPTIONS]
 
   OPTIONS:
   -o OUTPUT_DIR       - output directory (default $OUTPUT_DIR)
+  --docker-opts OPTS  - additional options to pass to docker run
+                        (can occur multiple times)
   -f ROOTFS_OVERLAY   - rootfs-overlay directory (default $ROOTFS_OVERLAY)
   --skip-sudo         - call docker directly, without sudo
   --dockerless        - use podman and buildah instead of docker daemon
@@ -32,7 +35,11 @@ Usage: $1 COMMAND CONFIGFILE [OPTIONS]
   command line options -o, -f override config file settings.
 
 Example:
-  ./builder.sh build example.cfg -o output -f myrootfs
+  # standard invocation
+  $PROG build example.cfg -o output -f myrootfs
+
+  # mount downloads to host directory
+  $PROG build example-nexx-wt3020.conf --docker-opts "-v=\$(pwd)/dl:/lede/imagebuilder/dl:z"
 EOT
     exit 0
 }
@@ -55,18 +62,19 @@ function run_cmd_in_container {
     [ ! -t 0 ] && docker_term_opts="-i"
     if [ -n "$REPOSITORIES_CONF" ]; then
         conf="$(abspath "$REPOSITORIES_CONF")"
-        REPOSITORIES_VOLUME=(-v "$conf":/lede/imagebuilder/repositories.conf:z)
+        repositories_volume=(-v "$conf":/lede/imagebuilder/repositories.conf:z)
     else
-        REPOSITORIES_VOLUME=()
+        repositories_volume=()
     fi
 
-    # shellcheck disable=2086
+    # shellcheck disable=SC2068 disable=SC2086
     $SUDO $DOCKER_RUN\
         --rm\
 		$docker_term_opts \
         -v "$(abspath "$ROOTFS_OVERLAY")":/lede/rootfs-overlay:z \
         -v "$(abspath "$OUTPUT_DIR")":/lede/output:z \
-        "${REPOSITORIES_VOLUME[@]}" \
+        "${repositories_volume[@]}" \
+        ${DOCKER_OPTS[@]} \
         --rm "$IMAGE_TAG" "$@"
 }
 
@@ -103,6 +111,7 @@ CONFIG_FILE=$1; shift
 SUDO=sudo
 DOCKER_BUILD="docker build"
 DOCKER_RUN="docker run -e GOSU_UID=$(id -ur) -e GOSU_GID=$(id -g)"
+DOCKER_OPTS=()
 
 # pull in config file, making $BASEDIR_CONFIG_FILE available inside`
 [ ! -f "$CONFIG_FILE" ] && fail "can not open $CONFIG_FILE"
@@ -111,8 +120,7 @@ BASEDIR_CONFIG_FILE=$( cd "$( dirname "$CONFIG_FILE" )" && pwd )
 eval "$(cat "$CONFIG_FILE")"
 
 # if macos skip sudo
-UNAME=$(uname)
-if [ "$UNAME" == "Darwin" ]; then
+if [ "$(uname)" == "Darwin" ]; then
     SUDO=""
 fi
 
@@ -127,6 +135,8 @@ while [[ $# -ge 1 ]]; do
             OUTPUT_DIR="$2"; shift ;;
         --skip-sudo)
             SUDO="" ;;
+        --docker-opts) 
+            DOCKER_OPTS+=("$2"); shift ;;
         --dockerless)
             SUDO=""
             DOCKER_BUILD="buildah bud --layers=true"
@@ -148,7 +158,8 @@ fi
 
 IMAGE_TAG=$IMAGE_TAG:$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET
 
-cat<<EOT
+function print_config {
+    cat<<EOT
 --- configuration ------------------------------
 RELEASE...........: $LEDE_RELEASE
 TARGET............: $LEDE_TARGET
@@ -163,14 +174,20 @@ REPOSITORIES_CONF.: $REPOSITORIES_CONF
 CONTAINER ENGINE..: $(echo "$DOCKER_RUN" | cut -d " " -f1)
 ------------------------------------------------
 EOT
+}
 
 case $COMMAND in
      build)
+         print_config
          build_lede_image  ;;
      build-docker-image)
+         print_config
          build_docker_image  ;;
      shell)
+         print_config
          run_shell ;;
-     *) usage "$0"; exit 0 ;;
+     *)
+        usage "$0"
+        exit 0 ;;
 esac
 
