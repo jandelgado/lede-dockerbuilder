@@ -82,10 +82,13 @@ Usage: ./builder.sh COMMAND CONFIGFILE [OPTIONS]
   command line options -o, -f override config file settings.
 
 Example:
-  # standard invocation
+  # build the builder docker image first
+  ./builder.sh build-docker-image example.cfg
+
+  # now build the OpenWrt image
   ./builder.sh build example.cfg -o output -f myrootfs
 
-  # mount downloads to host directory
+  # mount downloads to host directory during build
   ./builder.sh build example-nexx-wt3020.conf --docker-opts "-v=$(pwd)/dl:/lede/imagebuilder/dl:z"
 ```
 
@@ -146,7 +149,7 @@ encrypted USB disk attached so I can use it as a simple NAS with samba and ftp:
 ```
 # profile to use: NEXX WT3020
 LEDE_PROFILE=wt3020-8M
-LEDE_RELEASE=19.07.3
+LEDE_RELEASE=19.07.4
 LEDE_TARGET=ramips
 LEDE_SUBTARGET=mt7620
 
