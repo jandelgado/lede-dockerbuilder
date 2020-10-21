@@ -35,10 +35,13 @@ Usage: $1 COMMAND CONFIGFILE [OPTIONS]
   command line options -o, -f override config file settings.
 
 Example:
-  # standard invocation
+  # build the builder docker image first
+  $PROG build-docker-image example.cfg
+
+  # now build the OpenWrt image
   $PROG build example.cfg -o output -f myrootfs
 
-  # mount downloads to host directory
+  # mount downloads to host directory during build
   $PROG build example-nexx-wt3020.conf --docker-opts "-v=\$(pwd)/dl:/lede/imagebuilder/dl:z"
 EOT
     exit 0
