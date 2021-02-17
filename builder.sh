@@ -1,16 +1,19 @@
 #!/bin/bash
 # A container based OpenWRT image builder.
-# (c) Jan Delgado 2017-2019
-
-set -e
+#
+# https://github.com/jandelgado/lede-dockerbuilder
+#
+# (c) Jan Delgado 2017-2021
+set -euo pipefail
 
 # base Tag to use for docker imag
 IMAGE_TAG=openwrt-imagebuilder
-
 SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 # may be overridden in the config file
 OUTPUT_DIR=$SCRIPT_DIR/output
 ROOTFS_OVERLAY=$SCRIPT_DIR/rootfs-overlay
+LEDE_DISABLED_SERVICES=
+REPOSITORIES_CONF=
 PROG=$0
 
 function usage {

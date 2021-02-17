@@ -1,11 +1,11 @@
-FROM gliderlabs/alpine:3.9
+FROM alpine:3.13.1
 LABEL maintainer "Jan Delgado <jdelgado@gmx.net>"
 
 RUN  apk add --update asciidoc bash bc binutils bzip2 cdrkit coreutils\
                       diffutils findutils flex g++ gawk gcc gettext git grep\
                       intltool libxslt linux-headers make ncurses-dev patch\
                       perl python2-dev tar unzip  util-linux wget zlib-dev xz\
-                      python3\
+                      python3 rsync\
                       su-exec\
      && rm -rf /var/cache/apk/*
 
