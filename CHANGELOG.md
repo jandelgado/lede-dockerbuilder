@@ -1,5 +1,14 @@
 # Changelog for lede-dockerbuilder
 
+
+## v2.6 [2021-02-17] 
+
+* bump to OpenWrt 19.07.6
+
+## v2.5 [2020-10-21]
+
+* bump to OpenWrt 19.07.4
+
 ## v2.4 [2020-05-25]
 
 * new option `--docker-opts OPTS` to pass additional docker options to docker-run
