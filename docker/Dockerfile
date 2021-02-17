@@ -1,4 +1,4 @@
-FROM gliderlabs/alpine:3.9
+FROM alpine:3.13.1
 LABEL maintainer "Jan Delgado <jdelgado@gmx.net>"
 
 RUN  apk add --update asciidoc bash bc binutils bzip2 cdrkit coreutils\

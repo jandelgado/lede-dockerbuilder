@@ -4,6 +4,7 @@
 ## v2.6 [2021-02-17] 
 
 * bump to OpenWrt 19.07.6
+* bump alpine in builder image to 3.13
 
 ## v2.5 [2020-10-21]
 
