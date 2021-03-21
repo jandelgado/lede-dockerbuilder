@@ -1,6 +1,10 @@
 #!/bin/sh
 
-chown -R "$GOSU_UID:$GOSU_GID" /lede
+# only needed in docker, not rootless podman.
+if [ -f /.dockerenv ]; then
+    # this is very, very slow inside a docker container.
+    chown -R "$GOSU_UID:$GOSU_GID" /lede
+fi
 
 # If GOSU_UID:GOSU_GID environment variable set to something other than 0:0 (root:root),
 # become user:group set within and exec command passed in args
