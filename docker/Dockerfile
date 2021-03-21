@@ -15,8 +15,9 @@ RUN chmod 755 /usr/local/bin/entrypoint.sh
 # install the image builder. use tmpfile so that tar's compression
 # autodetection works.
 ARG BUILDER_URL
+ADD $BUILDER_URL /tmp/imagebuilder
+
 RUN    mkdir -p /lede/imagebuilder\
-    && wget  --progress=bar:force:noscroll $BUILDER_URL -O /tmp/imagebuilder\
     && tar xf /tmp/imagebuilder --strip-components=1 -C /lede/imagebuilder\
     && rm -f /tmp/imagebuilder
 
