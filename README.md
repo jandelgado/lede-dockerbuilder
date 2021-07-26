@@ -61,15 +61,15 @@ final OpenWrt image will be available in the `output/` directory.
 ### Usage
 
 ```
-
 Dockerized LEDE/OpenWRT image builder.
 
 Usage: ./builder.sh COMMAND CONFIGFILE [OPTIONS]
   COMMAND is one of:
-    build-docker-image- build the docker image (run once first)
-    build             - start container and build the LEDE/OpenWRT image
-    shell             - start shell in docker container
-  CONFIGFILE          - configuraton file to use
+    build-docker-image - build the docker image (run once first)
+    profiles  - start container and show avail profiles for current configuration
+    build     - start container and build the LEDE/OpenWRT image
+    shell     - start shell in docker container
+  CONFIGFILE  - configuraton file to use
 
   OPTIONS:
   -o OUTPUT_DIR       - output directory (default /home/paco/src/lede-dockerbuilder/output)
@@ -83,10 +83,13 @@ Usage: ./builder.sh COMMAND CONFIGFILE [OPTIONS]
 
 Example:
   # build the builder docker image first
-  ./builder.sh build-docker-image example.cfg
+  ./builder.sh build-docker-image example.conf
 
   # now build the OpenWrt image
-  ./builder.sh build example.cfg -o output -f myrootfs
+  ./builder.sh build example.conf -o output -f myrootfs
+
+  # show available profiles
+  ./builder.sh profiles example.conf 
 
   # mount downloads to host directory during build
   ./builder.sh build example-nexx-wt3020.conf --docker-opts "-v=$(pwd)/dl:/lede/imagebuilder/dl:z"
