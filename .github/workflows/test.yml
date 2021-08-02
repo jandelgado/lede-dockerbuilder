@@ -5,9 +5,22 @@ on:
     branches:
       - master
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: linting
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: shellcheck
+        run: shellcheck builder.sh
+
   test:
     runs-on: ubuntu-latest
     name: test
+    strategy:
+      matrix:
+        example: ["x86_64", "rpi4", "ginet-gl-mt300n-v2", "nexx-wt3020", "rpi2", "wrt1043nd"]
+        option: ["--skip-sudo", "--dockerless"]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -15,15 +28,10 @@ jobs:
         run: |
           sudo apt-get -y update
           sudo apt-get -y install podman
-      - name: shellcheck
-        run: shellcheck builder.sh
-      - name: test build examples
+      - name: test build example
         run: |
           mkdir -p output
-          for variant in "--skip-sudo" "--dockerless"; do
-            for f in *.conf; do
-              echo "\n\n\n**** BULDING $f with options $variant ****"
-              time ( ./builder.sh build-docker-image $f $variant && \
-                       ./builder.sh build $f $variant )
-            done
-          done
+          time ./builder.sh build-docker-image \
+                  example-${{ matrix.example }}.conf ${{ matrix.option }}  && \
+          time ./builder.sh build \
+                  example-${{ matrix.example }}.conf ${{ matrix.option }}  && \
