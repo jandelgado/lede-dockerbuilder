@@ -11,12 +11,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: install podman
+        run: |
+          sudo apt-get -y update
+          sudo apt-get -y install podman
       - name: shellcheck
         run: shellcheck builder.sh
       - name: test build examples
         run: |
           mkdir -p output
-          for f in *.conf; do
-            ./builder.sh build-docker-image $f --skip-sudo && \
-              ./builder.sh build $f --skip-sudo
+          for variant in "--skip-sudo" "--dockerless"; do
+            for f in *.conf; do
+              echo "\n\n\n**** BULDING $f with options $variant ****"
+              time ( ./builder.sh build-docker-image $f $variant && \
+                       ./builder.sh build $f $variant )
+            done
           done
