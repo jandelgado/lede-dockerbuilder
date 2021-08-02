@@ -1,5 +1,11 @@
 # Changelog for lede-dockerbuilder
 
+## v2.8 [2021-08-02]
+
+* bump to OpenWrt 21.02.0-rc2
+* add new `profile` option to show available profiles
+* ci uses matrix build now
+
 ## v2.7 [2021-03-17] 
 
 * bump to OpenWrt 19.07.7
