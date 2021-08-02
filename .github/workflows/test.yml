@@ -32,6 +32,6 @@ jobs:
         run: |
           mkdir -p output
           time ./builder.sh build-docker-image \
-                  example-${{ matrix.example }}.conf ${{ matrix.option }}  && \
+                  example-${{ matrix.example }}.conf ${{ matrix.option }}  &&\
           time ./builder.sh build \
-                  example-${{ matrix.example }}.conf ${{ matrix.option }}  && \
+                  example-${{ matrix.example }}.conf ${{ matrix.option }}  &&\
