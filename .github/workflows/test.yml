@@ -5,18 +5,33 @@ on:
     branches:
       - master
 jobs:
-  test:
+  lint:
     runs-on: ubuntu-latest
-    name: test
+    name: linting
     steps:
       - name: Checkout
         uses: actions/checkout@v2
       - name: shellcheck
         run: shellcheck builder.sh
-      - name: test build examples
+
+  test:
+    runs-on: ubuntu-latest
+    name: test
+    strategy:
+      matrix:
+        example: ["x86_64", "rpi4", "ginet-gl-mt300n-v2", "nexx-wt3020", "rpi2", "wrt1043nd"]
+        option: ["--skip-sudo", "--dockerless"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: install podman
+        run: |
+          sudo apt-get -y update
+          sudo apt-get -y install podman
+      - name: test build example
         run: |
           mkdir -p output
-          for f in *.conf; do
-            ./builder.sh build-docker-image $f --skip-sudo && \
-              ./builder.sh build $f --skip-sudo
-          done
+          time ./builder.sh build-docker-image \
+                  example-${{ matrix.example }}.conf ${{ matrix.option }}  &&\
+          time ./builder.sh build \
+                  example-${{ matrix.example }}.conf ${{ matrix.option }}

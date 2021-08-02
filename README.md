@@ -28,7 +28,7 @@ Easily and quickly build OpenWrt custom images (e.g. for your embedded device
 our Raspberry PI) using a self-contained docker container and the
 [OpenWrt image builder](https://openwrt.org/docs/guide-user/additional-software/imagebuilder).
 On the builder host, Docker or podman/buildah (for dockerless
-operation) is the only requirement. Supports latest OpenWrt release (19.07.0).
+operation) is the only requirement. Supports latest OpenWrt release (21.02.0).
 
 ### Note
 
@@ -61,15 +61,15 @@ final OpenWrt image will be available in the `output/` directory.
 ### Usage
 
 ```
-
 Dockerized LEDE/OpenWRT image builder.
 
 Usage: ./builder.sh COMMAND CONFIGFILE [OPTIONS]
   COMMAND is one of:
-    build-docker-image- build the docker image (run once first)
-    build             - start container and build the LEDE/OpenWRT image
-    shell             - start shell in docker container
-  CONFIGFILE          - configuraton file to use
+    build-docker-image - build the docker image (run once first)
+    profiles  - start container and show avail profiles for current configuration
+    build     - start container and build the LEDE/OpenWRT image
+    shell     - start shell in docker container
+  CONFIGFILE  - configuraton file to use
 
   OPTIONS:
   -o OUTPUT_DIR       - output directory (default /home/paco/src/lede-dockerbuilder/output)
@@ -83,10 +83,13 @@ Usage: ./builder.sh COMMAND CONFIGFILE [OPTIONS]
 
 Example:
   # build the builder docker image first
-  ./builder.sh build-docker-image example.cfg
+  ./builder.sh build-docker-image example.conf
 
   # now build the OpenWrt image
-  ./builder.sh build example.cfg -o output -f myrootfs
+  ./builder.sh build example.conf -o output -f myrootfs
+
+  # show available profiles
+  ./builder.sh profiles example.conf 
 
   # mount downloads to host directory during build
   ./builder.sh build example-nexx-wt3020.conf --docker-opts "-v=$(pwd)/dl:/lede/imagebuilder/dl:z"
@@ -147,19 +150,21 @@ WT3020](https://openwrt.org/toh/nexx/wt3020) router, where I have an
 encrypted USB disk attached so I can use it as a simple NAS with samba and ftp:
 
 ```
-# profile to use: NEXX WT3020
-LEDE_PROFILE=wt3020-8M
-LEDE_RELEASE=19.07.7
+# LEDE profile to use: NEXX WT3020
+LEDE_PROFILE=nexx_wt3020-8m
+LEDE_RELEASE=21.02.0-rc3
 LEDE_TARGET=ramips
 LEDE_SUBTARGET=mt7620
 
 # list packages to include in LEDE image. prepend packages to deinstall with "-".
-LEDE_PACKAGES="samba36-server kmod-usb-storage kmod-scsi-core kmod-fs-ext4 ntfs-3g\
-    kmod-nls-cp437 kmod-nls-iso8859-1 vsftpd cryptsetup kmod-crypto-xts\
-    kmod-crypto-iv block-mount kmod-usb-ohci kmod-usb2 kmod-dm\
+LEDE_PACKAGES="ksmbd-server ksmbd-utils vsftpd lsblk iwinfo tcpdump block-mount\
+    kmod-usb-storage-uas kmod-scsi-core kmod-fs-ext4 ntfs-3g\
+    kmod-nls-cp437 kmod-nls-iso8859-1 cryptsetup kmod-crypto-xts\
+    kmod-mt76 kmod-usb2 kmod-usb-ohci kmod-usb-core kmod-dm kmod-crypto-ecb\
     kmod-crypto-misc kmod-crypto-cbc kmod-crypto-crc32c kmod-crypto-hash\
-    kmod-crypto-user iwinfo tcpdump\
-    -ppp -kmod-ppp -kmod-pppoe -kmod-pppox -ppp-mod-pppoe"
+    kmod-crypto-user\
+    -ppp -kmod-ppp -kmod-pppoe -kmod-pppox -ppp-mod-pppoe\
+    -ip6tables -odhcp6c -kmod-ipv6 -kmod-ip6tables -odhcpd-ipv6only"
 ```
 
 ### File system overlay
@@ -230,8 +235,8 @@ These examples evolved from images I use myself.
 * [image with samba, vsftpd and encrypted usb disk for
   NEXX-WT3020](example-nexx-wt3020.conf). Is the predessor of ...
 * [image with samba, vsftpd and encrypted usb disk for
-  GINET-GL-M300N](example-ginet-gl-mt300n.conf). This is my travel router setup
-  where I have an encrypted USB disk connected to the router.
+  GINET-GL-M300N V2](example-ginet-gl-mt300n-v2.conf). This is my travel router
+  setup where I have an encrypted USB disk connected to the router.
 
 To build an example run `./builder.sh build <config-file>`, e.g.
 

@@ -22,10 +22,11 @@ Dockerized LEDE/OpenWRT image builder.
 
 Usage: $1 COMMAND CONFIGFILE [OPTIONS]
   COMMAND is one of:
-    build-docker-image- build the docker image (run once first)
-    build             - start container and build the LEDE/OpenWRT image
-    shell             - start shell in docker container
-  CONFIGFILE          - configuraton file to use
+    build-docker-image - build the docker image (run once first)
+    profiles  - start container and show avail profiles for current configuration
+    build     - start container and build the LEDE/OpenWRT image
+    shell     - start shell in docker container
+  CONFIGFILE  - configuraton file to use
 
   OPTIONS:
   -o OUTPUT_DIR       - output directory (default $OUTPUT_DIR)
@@ -39,10 +40,13 @@ Usage: $1 COMMAND CONFIGFILE [OPTIONS]
 
 Example:
   # build the builder docker image first
-  $PROG build-docker-image example.cfg
+  $PROG build-docker-image example.conf
 
   # now build the OpenWrt image
-  $PROG build example.cfg -o output -f myrootfs
+  $PROG build example.conf -o output -f myrootfs
+
+  # show available profiles
+  $PROG profiles example.conf 
 
   # mount downloads to host directory during build
   $PROG build example-nexx-wt3020.conf --docker-opts "-v=\$(pwd)/dl:/lede/imagebuilder/dl:z"
@@ -92,6 +96,11 @@ function build_lede_image {
                 DISABLED_SERVICES="$LEDE_DISABLED_SERVICES" \
                 FILES="/lede/rootfs-overlay" \
                 BIN_DIR="/lede/output"
+}
+
+# show available profiles
+function show_profiles {
+    run_cmd_in_container make info
 }
 
 # run a shell in the container, useful for debugging.
@@ -189,6 +198,8 @@ case $COMMAND in
      build-docker-image)
          print_config
          build_docker_image  ;;
+     profiles)
+         show_profiles ;;
      shell)
          print_config
          run_shell ;;
