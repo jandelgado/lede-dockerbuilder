@@ -2,7 +2,7 @@
 
 ## v2.8 [2021-08-02]
 
-* bump to OpenWrt 21.02.0-rc2
+* bump to OpenWrt 21.02.0-rc3
 * add new `profile` option to show available profiles
 * ci uses matrix build now
 
