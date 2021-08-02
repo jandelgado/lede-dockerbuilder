@@ -1,6 +1,9 @@
 name: test
 on:
   pull_request:
+    paths-ignore:
+      - 'README.md'
+      - 'CHANGELOG.md'
   push:
     branches:
       - master
