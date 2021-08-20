@@ -152,7 +152,7 @@ encrypted USB disk attached so I can use it as a simple NAS with samba and ftp:
 ```
 # LEDE profile to use: NEXX WT3020
 LEDE_PROFILE=nexx_wt3020-8m
-LEDE_RELEASE=21.02.0-rc3
+LEDE_RELEASE=21.02.0-rc4
 LEDE_TARGET=ramips
 LEDE_SUBTARGET=mt7620
 
