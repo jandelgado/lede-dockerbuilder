@@ -24,16 +24,17 @@
 
 ## What
 
-Easily and quickly build OpenWrt custom images (e.g. for your embedded device
-our Raspberry PI) using a self-contained docker container and the
-[OpenWrt image builder](https://openwrt.org/docs/guide-user/additional-software/imagebuilder).
-On the builder host, Docker or podman/buildah (for dockerless
-operation) is the only requirement. Supports latest OpenWrt release (21.02.0).
+Easily and quickly build [OpenWrt](https://openwrt.org/) custom images (e.g.
+for your embedded device our Raspberry PI) using a self-contained docker
+container and the [OpenWrt image
+builder](https://openwrt.org/docs/guide-user/additional-software/imagebuilder).
+On the builder host, Docker or podman/buildah (for dockerless operation) is the
+only requirement. Supports latest OpenWrt release (21.02.0).
 
 ### Note
 
 The OpenWrt-dockerbuilder uses pre-compiled packages to build the final image. 
-Look [here](https://github.com/jandelgado/lede-dockercompiler) if you are looking 
+Go [here](https://github.com/jandelgado/lede-dockercompiler) if you are looking 
 for a docker images to compile OpenWrt completely from source.
 
 ## Why
@@ -152,7 +153,7 @@ encrypted USB disk attached so I can use it as a simple NAS with samba and ftp:
 ```
 # LEDE profile to use: NEXX WT3020
 LEDE_PROFILE=nexx_wt3020-8m
-LEDE_RELEASE=21.02.0-rc4
+LEDE_RELEASE=21.02.0
 LEDE_TARGET=ramips
 LEDE_SUBTARGET=mt7620
 
