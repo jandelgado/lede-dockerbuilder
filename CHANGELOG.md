@@ -1,5 +1,9 @@
 # Changelog for lede-dockerbuilder
 
+## v2.11 [2022-03-16]
+
+* bump to OpenWrt 21.02.2
+
 ## v2.10 [2021-09-19]
 
 * bump to OpenWrt 21.02.0
