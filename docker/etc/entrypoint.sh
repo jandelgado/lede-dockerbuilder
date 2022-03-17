@@ -7,16 +7,13 @@ set -e
 if [ "$GOSU_UID:$GOSU_GID" != "0:0" ] && [ "$GOSU_UID:$GOSU_GID" != ":" ]; then
     export HOME="/lede"
 
-    chown "$GOSU_UID:$GOSU_GID" /lede
-    chown "$GOSU_UID:$GOSU_GID" /lede/*
 
-    # only needed when run with docker
-    if [ -f /.dockerenv ]; then
-        echo hello
-#        chown -R "$GOSU_UID:$GOSU_GID" /lede
-    fi
+
     groupadd -f -g "$GOSU_GID" builder
     useradd -u "$GOSU_UID" -g "$GOSU_GID" -s /bin/bash -d "/lede" builder || :
+
+    # make sure user has write permissions 
+    su builder -c "touch /lede/.writetest > /dev/null 2>&1" || ( echo "fix permissions..."; chown -R "$GOSU_UID:$GOSU_GID" /lede/imagebuilder )
     exec chroot --userspec "$GOSU_UID:$GOSU_GID" --skip-chdir / "$@"
 fi
 

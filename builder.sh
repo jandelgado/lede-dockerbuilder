@@ -84,8 +84,8 @@ function run_cmd_in_container {
     $SUDO $DOCKER_RUN\
         --rm\
 		$docker_term_opts \
-        -v "$(abspath "$ROOTFS_OVERLAY")":/lede/rootfs-overlay:z \
-        -v "$(abspath "$OUTPUT_DIR")":/lede/output:z \
+        -v "$(abspath "$ROOTFS_OVERLAY")":/lede/rootfs-overlay \
+        -v "$(abspath "$OUTPUT_DIR")":/lede/output \
         "${repositories_volume[@]}" \
         ${DOCKER_OPTS[@]} \
         --rm "$IMAGE_TAG" "$@"
@@ -160,8 +160,6 @@ while [[ $# -ge 1 ]]; do
             DOCKER_OPTS+=("$2"); shift 
             ;;
         --docker)
-            DOCKER_BUILD="docker build"
-            DOCKER_RUN="docker run -e GOSU_UID=$(id -ur) -e GOSU_GID=$(id -g)"
             ;;
         --nerdctl)
             DOCKER_BUILD="nerdctl build"

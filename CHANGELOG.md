@@ -1,5 +1,11 @@
 # Changelog for lede-dockerbuilder
 
+## v2.12 [2022-03-20]
+
+* new option: `--nerdctl` to build&run container with nerdctl 
+* change: `--skip-sudo` removed, is now the default. Use `--sudo` to enable 
+          sudo
+
 ## v2.11 [2022-03-16]
 
 * bump to OpenWrt 21.02.2
