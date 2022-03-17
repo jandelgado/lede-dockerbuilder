@@ -20,24 +20,19 @@ jobs:
     strategy:
       matrix:
         example: ["x86_64", "rpi4", "ginet-gl-mt300n-v2", "nexx-wt3020", "rpi2", "wrt1043nd"]
-        option: ["--nerdctl", "--docker", "--podman"]
+        option: ["--docker", "--podman"]
+        sudo: ["", "--sudo"]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
       - name: install podman
         run: |
           sudo apt-get -y update
-          sudo apt-get -y install podman curl
-          curl -qL "https://github.com/containerd/nerdctl/releases/download/v0.17.1/nerdctl-0.17.1-linux-amd64.tar.gz" -o nerdctl.tgz
-          mkdir -p $HOME/.local/bin
-          tar xvzf nerdctl.tgz -C $HOME/.local/bin
+          sudo apt-get -y install podman
       - name: test build example
         run: |
-          echo $PATH
-          PATH="$PATH:$HOME/.local/bin"
-          containerd-rootless-setuptool.sh install
           mkdir -p output
           time ./builder.sh build-docker-image \
-                  example-${{ matrix.example }}.conf ${{ matrix.option }}  &&\
+                  example-${{ matrix.example }}.conf ${{ matrix.option }}  ${{ matrix.sudo }} &&\
           time ./builder.sh build \
-                  example-${{ matrix.example }}.conf ${{ matrix.option }}
+                  example-${{ matrix.example }}.conf ${{ matrix.option }} ${{ matix.sudo }}
