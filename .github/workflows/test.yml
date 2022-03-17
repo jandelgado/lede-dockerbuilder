@@ -35,4 +35,4 @@ jobs:
           time ./builder.sh build-docker-image \
                   example-${{ matrix.example }}.conf ${{ matrix.option }}  ${{ matrix.sudo }} &&\
           time ./builder.sh build \
-                  example-${{ matrix.example }}.conf ${{ matrix.option }} ${{ matix.sudo }}
+                  example-${{ matrix.example }}.conf ${{ matrix.option }} ${{ matrix.sudo }}
