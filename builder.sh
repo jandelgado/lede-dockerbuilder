@@ -37,7 +37,7 @@ Usage: $1 COMMAND CONFIGFILE [OPTIONS]
   --sudo               - call container tool with sudo
   --podman             - use buildah and podman to build and run container
   --nerdctl            - use nerdctl to build and run container
-  --docker             - use docker to build and run container
+  --docker             - use docker to build and run container (default)
 
   command line options -o, -f override config file settings.
 

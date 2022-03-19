@@ -1,10 +1,13 @@
 # Changelog for lede-dockerbuilder
 
-## v2.12 [2022-03-20]
+## v3.0 [2022-03-20]
 
-* new option: `--nerdctl` to build&run container with nerdctl 
-* change: `--skip-sudo` removed, is now the default. Use `--sudo` to enable 
-          sudo
+* add experimental support for nerdctl with the new `--nerdctl` option
+* `--dockerless` option removed, use `--podman` or `--nerdctl` instead.
+  Docker is still the default
+* `--skip-sudo` removed, is now the default. Use `--sudo` to run commands with
+  sudo
+* use ubuntu LTS as base image
 
 ## v2.11 [2022-03-16]
 

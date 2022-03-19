@@ -5,17 +5,17 @@
 <!-- vim-markdown-toc GFM -->
 
 * [What](#what)
-    * [Note](#note)
+	* [Note](#note)
 * [Why](#why)
 * [How](#how)
-    * [Usage](#usage)
-        * [Dockerless operation](#dockerless-operation)
-    * [Configuration file](#configuration-file)
-    * [File system overlay](#file-system-overlay)
-    * [Example directory structure](#example-directory-structure)
-        * [Debugging](#debugging)
+	* [Usage](#usage)
+		* [Dockerless operation](#dockerless-operation)
+	* [Configuration file](#configuration-file)
+	* [File system overlay](#file-system-overlay)
+	* [Example directory structure](#example-directory-structure)
+		* [Debugging](#debugging)
 * [Examples](#examples)
-    * [Building a x86_64 image and running it in qemu](#building-a-x86_64-image-and-running-it-in-qemu)
+	* [Building a x86_64 image and running it in qemu](#building-a-x86_64-image-and-running-it-in-qemu)
 * [Building an OpenWrt snapshot release](#building-an-openwrt-snapshot-release)
 * [Author](#author)
 * [License](#license)
@@ -67,18 +67,21 @@ Dockerized LEDE/OpenWRT image builder.
 Usage: ./builder.sh COMMAND CONFIGFILE [OPTIONS]
   COMMAND is one of:
     build-docker-image - build the docker image (run once first)
-    profiles  - start container and show avail profiles for current configuration
-    build     - start container and build the LEDE/OpenWRT image
-    shell     - start shell in docker container
-  CONFIGFILE  - configuraton file to use
+    profiles           - start container and show avail profiles for
+                         current configuration
+    build              - start container and build the LEDE/OpenWRT image
+    shell              - start shell in docker container
+  CONFIGFILE           - configuraton file to use
 
   OPTIONS:
-  -o OUTPUT_DIR       - output directory (default /home/paco/src/lede-dockerbuilder/output)
-  --docker-opts OPTS  - additional options to pass to docker run
-                        (can occur multiple times)
-  -f ROOTFS_OVERLAY   - rootfs-overlay directory (default /home/paco/src/lede-dockerbuilder/rootfs-overlay)
-  --skip-sudo         - call docker directly, without sudo
-  --dockerless        - use podman and buildah instead of docker daemon
+  -o OUTPUT_DIR        - output directory (default /home/paco/src/lede-dockerbuilder/output)
+  --docker-opts OPTS   - additional options to pass to docker run
+                         (can occur multiple times)
+  -f ROOTFS_OVERLAY    - rootfs-overlay directory (default /home/paco/src/lede-dockerbuilder/rootfs-overlay)
+  --sudo               - call container tool with sudo
+  --podman             - use buildah and podman to build and run container
+  --nerdctl            - use nerdctl to build and run container
+  --docker             - use docker to build and run container (default)
 
   command line options -o, -f override config file settings.
 
@@ -90,16 +93,20 @@ Example:
   ./builder.sh build example.conf -o output -f myrootfs
 
   # show available profiles
-  ./builder.sh profiles example.conf 
+  ./builder.sh profiles example.conf
 
   # mount downloads to host directory during build
   ./builder.sh build example-nexx-wt3020.conf --docker-opts "-v=$(pwd)/dl:/lede/imagebuilder/dl:z"
 ```
 
-#### Dockerless operation
+#### Container runtime
 
-When called with `--dockerless` option, lede-dockerbuilder will use buildah and 
-podman to build and run the container.
+* By default docker will be used to build and run the container.
+* When called with `--podman` option, lede-dockerbuilder will use buildah and
+  podman to build and run the container.
+* When called with `--nerdctl` option, lede-dockerbuilder will use nerdctl to
+  build and run the container.
+* Use the `--sudo` option to run the container command with sudo.
 
 ### Configuration file
 
@@ -158,7 +165,11 @@ LEDE_TARGET=ramips
 LEDE_SUBTARGET=mt7620
 
 # list packages to include in LEDE image. prepend packages to deinstall with "-".
-LEDE_PACKAGES="ksmbd-server ksmbd-utils vsftpd lsblk iwinfo tcpdump block-mount\
+# 
+# include all packages to build a mobile NAS supporting disk encryption:
+# ksmbd (samba4 is too large now for the WT3020's 8MB), cryptsetup.
+# see https://github.com/namjaejeon/ksmbd-tools for ksmbd info.
+LEDE_PACKAGES="ksmbd-server ksmbd-utils lsblk iwinfo tcpdump block-mount\
     kmod-usb-storage-uas kmod-scsi-core kmod-fs-ext4 ntfs-3g\
     kmod-nls-cp437 kmod-nls-iso8859-1 cryptsetup kmod-crypto-xts\
     kmod-mt76 kmod-usb2 kmod-usb-ohci kmod-usb-core kmod-dm kmod-crypto-ecb\
@@ -166,6 +177,9 @@ LEDE_PACKAGES="ksmbd-server ksmbd-utils vsftpd lsblk iwinfo tcpdump block-mount\
     kmod-crypto-user\
     -ppp -kmod-ppp -kmod-pppoe -kmod-pppox -ppp-mod-pppoe\
     -ip6tables -odhcp6c -kmod-ipv6 -kmod-ip6tables -odhcpd-ipv6only"
+
+# optionally override OUTPUT_DIR and ROOTFS_OVERLAY directory location here
+
 ```
 
 ### File system overlay
@@ -298,7 +312,7 @@ the raspi 4, which is (as of may 2020) only available on the snapshots branch.
 
 ## Author
 
-Jan Delgado
+(C) Copyright 2017-2022 by Jan Delgado
 
 ## License
 
