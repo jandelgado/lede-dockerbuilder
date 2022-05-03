@@ -29,7 +29,8 @@ for your embedded device our Raspberry PI) using a self-contained docker
 container and the [OpenWrt image
 builder](https://openwrt.org/docs/guide-user/additional-software/imagebuilder).
 On the builder host, Docker or podman/buildah (for dockerless operation) is the
-only requirement. Supports latest OpenWrt release (21.02.3).
+only requirement. Supports latest OpenWrt release (21.02.3) and upcomig 22.03.x
+release ([example](example-x86_64-22.03.x.conf)).
 
 ### Note
 
@@ -278,11 +279,11 @@ qemu-system-x86_64 \
     -enable-kvm \
     -nographic \
     -device ide-hd,drive=d0,bus=ide.0 \
-    -drive file=output/openwrt-19.07.0-x86-64-combined-ext4.img,id=d0,if=none  \
     -netdev user,id=hn0 \
     -device virtio-net-pci,netdev=hn0,id=wan \
     -netdev user,id=hn1,hostfwd=tcp::5555-:22001 \
-    -device virtio-net-pci,netdev=hn1,id=lan 
+    -device virtio-net-pci,netdev=hn1,id=lan \
+    -drive id=d0,if=none,file=output/openwrt-19.07.0-x86-64-combined-ext4.img
 ```
 
 The `hostfwd=...` part can be omitted and is used in case you redirect port
