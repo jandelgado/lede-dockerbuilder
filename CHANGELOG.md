@@ -1,6 +1,11 @@
 # Changelog for lede-dockerbuilder
 
-## v3.0 [2022-03-20]
+## v3.1 [2022-05-03]
+
+* Upgrade to OpenWrt 21.02.3
+* Add an example for the upcoming OpenWrt 22.03 version
+
+## v3.0 [2022-05-03]
 
 * add experimental support for nerdctl with the new `--nerdctl` option
 * `--dockerless` option removed, use `--podman` or `--nerdctl` instead.
