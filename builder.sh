@@ -3,7 +3,7 @@
 #
 # https://github.com/jandelgado/lede-dockerbuilder
 #
-# (c) Jan Delgado 2017-2021
+# (c) Jan Delgado 2017-2022
 set -euo pipefail
 
 # base Tag to use for docker imag
@@ -23,18 +23,21 @@ Dockerized LEDE/OpenWRT image builder.
 Usage: $1 COMMAND CONFIGFILE [OPTIONS]
   COMMAND is one of:
     build-docker-image - build the docker image (run once first)
-    profiles  - start container and show avail profiles for current configuration
-    build     - start container and build the LEDE/OpenWRT image
-    shell     - start shell in docker container
-  CONFIGFILE  - configuraton file to use
+    profiles           - start container and show avail profiles for
+                         current configuration
+    build              - start container and build the LEDE/OpenWRT image
+    shell              - start shell in docker container
+  CONFIGFILE           - configuraton file to use
 
   OPTIONS:
-  -o OUTPUT_DIR       - output directory (default $OUTPUT_DIR)
-  --docker-opts OPTS  - additional options to pass to docker run
-                        (can occur multiple times)
-  -f ROOTFS_OVERLAY   - rootfs-overlay directory (default $ROOTFS_OVERLAY)
-  --skip-sudo         - call docker directly, without sudo
-  --dockerless        - use podman and buildah instead of docker daemon
+  -o OUTPUT_DIR        - output directory (default $OUTPUT_DIR)
+  --docker-opts OPTS   - additional options to pass to docker run
+                         (can occur multiple times)
+  -f ROOTFS_OVERLAY    - rootfs-overlay directory (default $ROOTFS_OVERLAY)
+  --sudo               - call container tool with sudo
+  --podman             - use buildah and podman to build and run container
+  --nerdctl            - use nerdctl to build and run container
+  --docker             - use docker to build and run container (default)
 
   command line options -o, -f override config file settings.
 
@@ -46,7 +49,7 @@ Example:
   $PROG build example.conf -o output -f myrootfs
 
   # show available profiles
-  $PROG profiles example.conf 
+  $PROG profiles example.conf
 
   # mount downloads to host directory during build
   $PROG build example-nexx-wt3020.conf --docker-opts "-v=\$(pwd)/dl:/lede/imagebuilder/dl:z"
@@ -81,8 +84,8 @@ function run_cmd_in_container {
     $SUDO $DOCKER_RUN\
         --rm\
 		$docker_term_opts \
-        -v "$(abspath "$ROOTFS_OVERLAY")":/lede/rootfs-overlay:z \
-        -v "$(abspath "$OUTPUT_DIR")":/lede/output:z \
+        -v "$(abspath "$ROOTFS_OVERLAY")":/lede/rootfs-overlay \
+        -v "$(abspath "$OUTPUT_DIR")":/lede/output \
         "${repositories_volume[@]}" \
         ${DOCKER_OPTS[@]} \
         --rm "$IMAGE_TAG" "$@"
@@ -114,6 +117,10 @@ function fail {
     exit 1
 }
 
+function warn {
+    echo "WARNING: $*" >&2
+}
+
 if [ $# -lt 2 ]; then
     usage "$0"
     exit 1
@@ -123,7 +130,7 @@ COMMAND=$1; shift
 CONFIG_FILE=$1; shift
 
 # default: use docker
-SUDO=sudo
+SUDO=""
 DOCKER_BUILD="docker build"
 DOCKER_RUN="docker run -e GOSU_UID=$(id -ur) -e GOSU_GID=$(id -g)"
 DOCKER_OPTS=()
@@ -145,17 +152,34 @@ while [[ $# -ge 1 ]]; do
     key="$1"
     case $key in
         -f)
-            ROOTFS_OVERLAY="$2"; shift ;;
+            ROOTFS_OVERLAY="$2"; shift 
+            ;;
         -o)
-            OUTPUT_DIR="$2"; shift ;;
-        --skip-sudo)
-            SUDO="" ;;
-        --docker-opts) 
-            DOCKER_OPTS+=("$2"); shift ;;
-        --dockerless)
-            SUDO=""
+            OUTPUT_DIR="$2"; shift 
+            ;;
+        --sudo)
+            SUDO="sudo" 
+            ;;
+        --docker-opts)
+            DOCKER_OPTS+=("$2"); shift 
+            ;;
+        --docker)
+            ;;
+        --nerdctl)
+            DOCKER_BUILD="nerdctl build"
+            DOCKER_RUN="nerdctl run -e GOSU_UID=$(id -ur) -e GOSU_GID=$(id -g)"
+            ;;
+        --podman)
             DOCKER_BUILD="buildah bud --layers=true"
-            DOCKER_RUN="podman run" ;;
+            DOCKER_RUN="podman run" 
+            ;;
+        --dockerless)
+            fail "option --dockerless removed. Use --podman or --nerdctl instead"
+            ;;
+        --skip-sudo)
+            warn "option --skip-sudo removed (is now the default). Use --sudo to enable sudo"
+            ;;
+
         *)
             fail "invalid option: $key";;
     esac

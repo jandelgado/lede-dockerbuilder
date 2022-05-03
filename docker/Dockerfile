@@ -1,13 +1,11 @@
-FROM alpine:3.13.1
+FROM ubuntu:18.04
 LABEL maintainer "Jan Delgado <jdelgado@gmx.net>"
 
-RUN  apk add --update asciidoc bash bc binutils bzip2 cdrkit coreutils\
-                      diffutils findutils flex g++ gawk gcc gettext git grep\
-                      intltool libxslt linux-headers make ncurses-dev patch\
-                      perl python2-dev tar unzip  util-linux wget zlib-dev xz\
-                      python3 rsync\
-                      su-exec\
-     && rm -rf /var/cache/apk/*
+RUN    apt-get update\
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential\
+         libncurses5-dev libncursesw5-dev zlib1g-dev gawk git gettext libssl-dev\
+         xsltproc rsync wget unzip python3\
+    && rm -rf /var/lib/apt/lists/*
 
 ADD etc/entrypoint.sh /usr/local/bin/
 RUN chmod 755 /usr/local/bin/entrypoint.sh 
@@ -19,8 +17,7 @@ ADD $BUILDER_URL /tmp/imagebuilder
 
 RUN    mkdir -p /lede/imagebuilder\
     && tar xf /tmp/imagebuilder --strip-components=1 -C /lede/imagebuilder\
-    && rm -f /tmp/imagebuilder
-
+    && rm -f /tmp/imagebuilder 
 
 WORKDIR "/lede/imagebuilder"
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

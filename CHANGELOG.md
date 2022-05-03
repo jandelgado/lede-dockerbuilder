@@ -1,5 +1,14 @@
 # Changelog for lede-dockerbuilder
 
+## v3.0 [2022-03-20]
+
+* add experimental support for nerdctl with the new `--nerdctl` option
+* `--dockerless` option removed, use `--podman` or `--nerdctl` instead.
+  Docker is still the default
+* `--skip-sudo` removed, is now the default. Use `--sudo` to run commands with
+  sudo
+* use ubuntu LTS as base image
+
 ## v2.11 [2022-03-16]
 
 * bump to OpenWrt 21.02.2
