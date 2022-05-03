@@ -117,6 +117,10 @@ function fail {
     exit 1
 }
 
+function warn {
+    echo "WARNING: $*" >&2
+}
+
 if [ $# -lt 2 ]; then
     usage "$0"
     exit 1
@@ -169,6 +173,13 @@ while [[ $# -ge 1 ]]; do
             DOCKER_BUILD="buildah bud --layers=true"
             DOCKER_RUN="podman run" 
             ;;
+        --dockerless)
+            fail "option --dockerless removed. Use --podman or --nerdctl instead"
+            ;;
+        --skip-sudo)
+            warn "option --skip-sudo removed (is now the default). Use --sudo to enable sudo"
+            ;;
+
         *)
             fail "invalid option: $key";;
     esac
