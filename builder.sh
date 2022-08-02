@@ -9,12 +9,14 @@ set -euo pipefail
 # base Tag to use for docker imag
 IMAGE_TAG=openwrt-imagebuilder
 SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
 # may be overridden in the config file
 OUTPUT_DIR=$SCRIPT_DIR/output
 ROOTFS_OVERLAY=$SCRIPT_DIR/rootfs-overlay
 LEDE_DISABLED_SERVICES=
 REPOSITORIES_CONF=
 PROG=$0
+BUILD_DIR=".build"
 
 function usage {
     cat<<EOT
@@ -38,6 +40,7 @@ Usage: $1 COMMAND CONFIGFILE [OPTIONS]
   --podman             - use buildah and podman to build and run container
   --nerdctl            - use nerdctl to build and run container
   --docker             - use docker to build and run container (default)
+  --nix                - build using nix-shell
 
   command line options -o, -f override config file settings.
 
@@ -70,6 +73,10 @@ function build_docker_image  {
         --build-arg BUILDER_URL="$LEDE_BUILDER_URL" -t "$IMAGE_TAG" docker
 }
 
+function run_cmd_in_nix_shell {
+    nix-shell --pure --command "bash -c '$*'"
+}
+
 function run_cmd_in_container {
     local docker_term_opts="-ti"
     [ ! -t 0 ] && docker_term_opts="-i"
@@ -88,27 +95,40 @@ function run_cmd_in_container {
         -v "$(abspath "$OUTPUT_DIR")":/lede/output \
         "${repositories_volume[@]}" \
         ${DOCKER_OPTS[@]} \
-        --rm "$IMAGE_TAG" "$@"
+        --rm "$IMAGE_TAG" bash -c "$*"
 }
 
-# run the builder in the container.
-function build_lede_image {
-    echo "building image for $LEDE_PROFILE ..."
-    run_cmd_in_container  make image PROFILE="$LEDE_PROFILE" \
-                PACKAGES="$LEDE_PACKAGES" \
-                DISABLED_SERVICES="$LEDE_DISABLED_SERVICES" \
-                FILES="/lede/rootfs-overlay" \
-                BIN_DIR="/lede/output"
+function run_cmd {
+    if [ "$RUNTIME" == "nix" ]; then
+        run_cmd_in_nix_shell "$@"
+    else
+        run_cmd_in_container "$@"
+    fi
+}
+
+# return the command to run the builder
+function build_cmd {
+    local build_dir=$1
+    local overlay=$2
+    local output=$3
+    local cmd="make -C \"$build_dir\" \
+        image PROFILE=\"$LEDE_PROFILE\" \
+        PACKAGES=\"$LEDE_PACKAGES\" \
+        DISABLED_SERVICES=\"$LEDE_DISABLED_SERVICES\" \
+        FILES=\"$overlay\" \
+        BIN_DIR=\"$output\""
+    echo "$cmd"
 }
 
 # show available profiles
 function show_profiles {
-    run_cmd_in_container make info
+    local build_dir=$1
+    run_cmd make -C "$build_dir" info
 }
 
 # run a shell in the container, useful for debugging.
 function run_shell {
-    run_cmd_in_container bash
+    run_cmd bash
 }
 
 # print message and exit
@@ -133,6 +153,7 @@ CONFIG_FILE=$1; shift
 SUDO=""
 DOCKER_BUILD="docker build"
 DOCKER_RUN="docker run -e GOSU_UID=$(id -ur) -e GOSU_GID=$(id -g)"
+RUNTIME="docker"
 DOCKER_OPTS=()
 
 # pull in config file, making $BASEDIR_CONFIG_FILE available inside`
@@ -146,7 +167,6 @@ if [ "$(uname)" == "Darwin" ]; then
     SUDO=""
 fi
 
-
 # parse cli args, can override config file params
 while [[ $# -ge 1 ]]; do
     key="$1"
@@ -156,6 +176,9 @@ while [[ $# -ge 1 ]]; do
             ;;
         -o)
             OUTPUT_DIR="$2"; shift 
+            ;;
+        --nix)
+            RUNTIME="nix"
             ;;
         --sudo)
             SUDO="sudo" 
@@ -168,10 +191,12 @@ while [[ $# -ge 1 ]]; do
         --nerdctl)
             DOCKER_BUILD="nerdctl build"
             DOCKER_RUN="nerdctl run -e GOSU_UID=$(id -ur) -e GOSU_GID=$(id -g)"
+            RUNTIME="nerdctl"
             ;;
         --podman)
             DOCKER_BUILD="buildah bud --layers=true"
             DOCKER_RUN="podman run" 
+            RUNTIME="podman"
             ;;
         --dockerless)
             fail "option --dockerless removed. Use --podman or --nerdctl instead"
@@ -210,25 +235,56 @@ OUTPUT_DIR........: $OUTPUT_DIR
 ROOTFS_OVERLAY....: $ROOTFS_OVERLAY
 DISABLED_SERVICES.: $LEDE_DISABLED_SERVICES
 REPOSITORIES_CONF.: $REPOSITORIES_CONF
-CONTAINER ENGINE..: $(echo "$DOCKER_RUN" | cut -d " " -f1)
+RUNTIME...........: $RUNTIME
 ------------------------------------------------
 EOT
+}
+
+BUILDER_DIR="$BUILD_DIR/$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET"
+
+# download the OpenWRT image builder (when using nix-shell)
+download_builder() {
+    local dir=$1
+    local url=$2
+
+    if [ -d "$dir" ]; then
+        # image builder already downloaded
+        return
+    fi
+
+    mkdir -p "$dir"
+    echo curl "download $url -> $dir" 
+    curl --progress-bar "$url" -o "$dir/tmpbuilder" \
+         && tar xfa "$dir/tmpbuilder" --strip-components=1 -C "$dir" \
+         && rm "$dir/tmpbuilder"
 }
 
 case $COMMAND in
      build)
          print_config
-         build_lede_image  ;;
+         if [ "$RUNTIME" == "nix" ]; then
+             download_builder "$BUILDER_DIR" "$LEDE_BUILDER_URL"
+             cmd=$(build_cmd "$BUILDER_DIR" "$ROOTFS_OVERLAY" "$OUTPUT_DIR")
+             run_cmd "$cmd"
+         else 
+             cmd=$(build_cmd "." "/lede/rootfs-overlay" "/lede/output")               # docker
+             run_cmd "$cmd"
+         fi
+         ;;
      build-docker-image)
+         [ "$RUNTIME" == "nix" ] && warn "refusing to build docker image when using --nix" && exit
          print_config
-         build_docker_image  ;;
+         build_docker_image  
+         ;;
      profiles)
-         show_profiles ;;
+         show_profiles "$BUILDER_DIR"
+         ;;
      shell)
          print_config
-         run_shell ;;
+         run_shell 
+         ;;
      *)
         usage "$0"
-        exit 0 ;;
+        exit 0 
+        ;;
 esac
-
