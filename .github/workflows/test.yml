@@ -18,7 +18,7 @@ jobs:
     name: test nix builds
     strategy:
       matrix:
-        example: ["x86_64", "rpi4", "ginet-gl-mt300n-v2", "nexx-wt3020", "rpi2", "wrt1043nd"]
+        example: ["x86_64", "rpi4", "ginet-gl-mt300n-v2", "nexx-wt3020", "rpi2"]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -36,7 +36,7 @@ jobs:
     name: test container builds
     strategy:
       matrix:
-        example: ["x86_64", "rpi4", "ginet-gl-mt300n-v2", "nexx-wt3020", "rpi2", "wrt1043nd"]
+        example: ["x86_64", "rpi4", "ginet-gl-mt300n-v2", "nexx-wt3020", "rpi2"]
         option: ["--docker", "--podman"]
         sudo: ["", "--sudo"]
     steps:
