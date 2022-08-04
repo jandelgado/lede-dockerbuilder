@@ -12,7 +12,8 @@ PREFIX="openwrt-$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET-$LEDE_PROFILE"
 
 echo "Test if images are generated for $PREFIX ..."
 
-FILES=$(find "$DIR"  -type f -name "$PREFIX-*.img.gz" | wc -l)
+FILES=$(find "$DIR"  -type f -name "$PREFIX-*.img.gz" \
+        -o -name "$PREFIX-*.bin" | wc -l)
 
 [ "$FILES" -eq "0" ] && fail "no images were built for $PREFIX"
 
