@@ -28,6 +28,9 @@ jobs:
           . $HOME/.nix-profile/etc/profile.d/nix.sh
           mkdir -p output
           time ./builder.sh build example-${{ matrix.example }}.conf --nix
+      - name: check artefacts
+        run: |
+          ./.test/run_all.sh example-${{ matrix.example }}.conf output/
   testcontainer:
     runs-on: ubuntu-latest
     name: test container builds
@@ -50,3 +53,6 @@ jobs:
                   example-${{ matrix.example }}.conf ${{ matrix.option }}  ${{ matrix.sudo }} &&\
           time ./builder.sh build \
                   example-${{ matrix.example }}.conf ${{ matrix.option }} ${{ matrix.sudo }}
+      - name: check artefacts
+        run: |
+          ./.test/run_all.sh example-${{ matrix.example }}.conf output/
