@@ -7,6 +7,7 @@ set -eou pipefail
 SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 CONF=$1
 OUT=$2
+RC=0
 
 echo "----------------------------------------------------------------------"
 echo "run tests for $CONF"
@@ -16,7 +17,8 @@ for t in "$SCRIPT_DIR"/test_*.sh; do
         echo "test OK"
     else
         echo "test FAILED"
+        RC=1
     fi
 done
 
-
+exit $RC

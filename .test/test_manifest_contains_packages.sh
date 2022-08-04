@@ -19,6 +19,7 @@ if [ ! -f "$MANIFEST" ]; then
 fi
 
 for p in $LEDE_PACKAGES; do 
+    [[ $p == -* ]] && continue  # excluded packages start with "-"
     grep -q -E "^$p" "$MANIFEST" || fail "pkg not in manifest: $p"
 done
 
