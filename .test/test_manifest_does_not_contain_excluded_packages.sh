@@ -12,15 +12,17 @@ fail() {
 PREFIX="openwrt-$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET-$LEDE_PROFILE"
 MANIFEST="$DIR/$PREFIX.manifest"
 
-echo "Test all configured packages are in manifest file $MANIFEST..."
+echo "Test all excluded packages are not in manifest file $MANIFEST..."
 if [ ! -f "$MANIFEST" ]; then
     fail "$MANIFEST does not exist"
     exit 1
 fi
 
 for p in $LEDE_PACKAGES; do 
-    [[ $p == -* ]] && continue
-    grep -q -E "^$p " "$MANIFEST" || fail "package not in manifest: $p"
+    # consider only excluded packages, starting with "-", e.g. "-ppp"
+    [[ ! $p == -* ]] && continue
+    p=${p:1}
+    grep -q -E "^$p " "$MANIFEST" && fail "package not expected to be in manifest: $p"
 done
 
 exit $FAIL
