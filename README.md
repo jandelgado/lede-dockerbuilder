@@ -326,8 +326,8 @@ LEDE_RELEASE=snapshots
 LEDE_BUILDER_URL="https://downloads.openwrt.org/$LEDE_RELEASE/targets/$LEDE_TARGET/$LEDE_SUBTARGET/openwrt-imagebuilder-$LEDE_TARGET-$LEDE_SUBTARGET.Linux-x86_64.tar.xz" 
 ```
 
-See the [Raspberry Pi 4 example](example-rpi4.conf) which builds an image for
-the raspi 4, which is (as of may 2020) only available on the snapshots branch.
+See the [this example](example-x86_64-snapshot.conf) which builds an x86_64
+image using the snapshot release.
 
 ## Author
 
