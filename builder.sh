@@ -1,5 +1,6 @@
 #!/bin/bash
-# A frontend to the OpenWrt imagebuilder
+# A frontend to the OpenWrt image builder, using containers (e.g. docker) 
+# or a nix-shell to run the OpenWrt image builder.
 #
 # https://github.com/jandelgado/lede-dockerbuilder
 #
@@ -14,7 +15,7 @@ ROOTFS_OVERLAY=$SCRIPT_DIR/rootfs-overlay
 LEDE_DISABLED_SERVICES=
 REPOSITORIES_CONF=
 
-BUILD_DIR=".build"
+BUILD_DIR=${NIX_BUILD_DIR:-"$SCRIPT_DIR/.build"}
 SUDO=""
 DOCKER_BUILD="docker build"
 DOCKER_RUN="docker run -e GOSU_UID=$(id -ur) -e GOSU_GID=$(id -g)"
@@ -28,10 +29,9 @@ Dockerized LEDE/OpenWRT image builder.
 Usage: $1 COMMAND CONFIGFILE [OPTIONS]
   COMMAND is one of:
     build-docker-image - build the docker image (run once first)
-    profiles           - start container and show avail profiles for
-                         current configuration
+    profiles           - show available profiles for current configuration
     build              - start container and build the LEDE/OpenWRT image
-    shell              - start shell in docker container
+    shell              - start shell in the build dir 
   CONFIGFILE           - configuraton file to use
 
   OPTIONS:
@@ -51,14 +51,17 @@ Example:
   # build the builder docker image first
   $PROG build-docker-image example.conf
 
-  # now build the OpenWrt image
+  # now build the OpenWrt image, override output and rootfs locations
   $PROG build example.conf -o output -f myrootfs
 
-  # show available profiles
+  # show available profiles 
   $PROG profiles example.conf
 
   # mount downloads to host directory during build
   $PROG build example-nexx-wt3020.conf --docker-opts "-v=\$(pwd)/dl:/lede/imagebuilder/dl:z"
+
+  # use nix to build the OpenWrt image, no need to build a container first
+  $PROG build example.conf --nix
 EOT
     exit 0
 }
@@ -134,7 +137,8 @@ function show_profiles {
 
 # run a shell in the container, useful for debugging.
 function run_shell {
-    run_cmd bash
+    local cwd=$1
+    run_cmd "cd $cwd && bash"
 }
 
 # print message and exit
@@ -200,11 +204,25 @@ function image_tag {
     echo "openwrt-imagebuilder:$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET"
 }
 
+function builder_dir {
+    if [ "$RUNTIME" == "nix" ]; then
+        echo "$BUILD_DIR/$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET"
+    else
+        echo "."
+    fi
+}
+
 function ensure_dirs {
     mkdir -p "$OUTPUT_DIR"
     [ ! -d "$OUTPUT_DIR" ] && fail "output-dir: no such directory $OUTPUT_DIR"
     [ ! -d "$ROOTFS_OVERLAY" ] && fail "rootfs-overlay: no such directory $ROOTFS_OVERLAY"
     true
+}
+
+function ensure_nix_env {
+    local builder_dir=$1
+    local builder_url=$2
+    download_builder "$builder_dir" "$(builder_url)"
 }
 
 # parse cli args, can override config file params
@@ -257,20 +275,17 @@ function dispatch_command {
     local command=$1
 
     ensure_dirs
+    [ "$RUNTIME" == "nix" ] && ensure_nix_env "$(builder_dir)" "$(builder_url)"
 
     case $command in
          build)
              print_config
              if [ "$RUNTIME" == "nix" ]; then
-                 # TODO
-                    NIX_BUILDER_DIR="$BUILD_DIR/$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET"
-                 download_builder "$NIX_BUILDER_DIR" "$(builder_url)"
-                 cmd=$(build_cmd "$NIX_BUILDER_DIR" "$ROOTFS_OVERLAY" "$OUTPUT_DIR")
-                 run_cmd "$cmd"
+                 cmd=$(build_cmd "$(builder_dir)" "$ROOTFS_OVERLAY" "$OUTPUT_DIR")
              else 
-                 cmd=$(build_cmd "." "/lede/rootfs-overlay" "/lede/output")               # docker
-                 run_cmd "$cmd"
+                 cmd=$(build_cmd "$(builder_dir)" "/lede/rootfs-overlay" "/lede/output")
              fi
+             run_cmd "$cmd"
              ;;
          build-docker-image)
              [ "$RUNTIME" == "nix" ] && warn "refusing to build docker image when using --nix" && exit
@@ -278,11 +293,11 @@ function dispatch_command {
              build_docker_image "$(builder_url)" "$(image_tag)"
              ;;
          profiles)
-             show_profiles "$BUILDER_DIR"
+             show_profiles "$(builder_dir)"
              ;;
          shell)
              print_config
-             run_shell 
+             run_shell "$(builder_dir)"
              ;;
          *)
             usage "$0"

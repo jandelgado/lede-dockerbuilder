@@ -73,7 +73,7 @@ $ ./builder.sh build example-nexx-wt3020.conf --nix
 ```
 
 Using nix-shell does not require building a container image or starting a 
-container first. 
+container first, therefore it is usually faster.
 
 ### Usage
 ```
@@ -125,7 +125,13 @@ Example:
   build and run the container.
 * Use the `--sudo` option to run the container command with sudo.
 * Use the `--nix` option to run the build in a [nix-shell](shell.nix) (instead
-    of using a container runtime)
+  of using a container runtime)
+
+When using a container builder like docker, the build container will be newly
+created on every build. When using the nix builder, the build environment will
+be reused, which is ususally faster. By default, the nix build environments are
+installed in the `.build` directory, relative to the `builder.sh` script. This
+can be overriden with the `NIX_BUILD_DIR` environment variable.
 
 ### Configuration file
 
