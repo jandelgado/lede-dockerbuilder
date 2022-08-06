@@ -162,11 +162,6 @@ DOCKER_OPTS=()
 BASEDIR_CONFIG_FILE=$( cd "$( dirname "$CONFIG_FILE" )" && pwd )
 eval "$(cat "$CONFIG_FILE")"
 
-# if macos skip sudo
-if [ "$(uname)" == "Darwin" ]; then
-    SUDO=""
-fi
-
 # parse cli args, can override config file params
 while [[ $# -ge 1 ]]; do
     key="$1"
