@@ -49,19 +49,19 @@ Usage: $1 COMMAND CONFIGFILE [OPTIONS]
 
 Example:
   # build the builder docker image first
-  $PROG build-docker-image example.conf
+  ./builder.sh build-docker-image example-glinet-gl-ar750.conf
 
-  # now build the OpenWrt image, override output and rootfs locations
-  $PROG build example.conf -o output -f myrootfs
+  # now build the OpenWrt image, overriding output and rootfs locations
+  ./builder.sh build example-glinet-gl-ar750.conf -o output -f myrootfs
 
-  # show available profiles 
-  $PROG profiles example.conf
+  # show available profiles for the arch/target/subtarget of the given configuration
+  ./builder.sh profiles example-glinet-gl-ar750.conf
 
-  # mount downloads to host directory during build
-  $PROG build example-nexx-wt3020.conf --docker-opts "-v=\$(pwd)/dl:/lede/imagebuilder/dl:z"
+  # pass additional docker options: mount downloads to host directory during build
+  ./builder.sh build example-glinet-gl-ar750.conf --docker-opts "-v=$(pwd)/dl:/lede/imagebuilder/dl:z"
 
   # use nix to build the OpenWrt image, no need to build a container first
-  $PROG build example.conf --nix
+  ./builder.sh build example-x86_64.conf --nix
 EOT
     exit 0
 }
