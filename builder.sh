@@ -26,7 +26,7 @@ function usage {
     cat<<EOT
 Dockerized LEDE/OpenWRT image builder.
 
-Usage: $1 COMMAND CONFIGFILE [OPTIONS]
+Usage: $PROG COMMAND CONFIGFILE [OPTIONS]
   COMMAND is one of:
     build-docker-image - build the docker image (run once first)
     profiles           - show available profiles for current configuration
@@ -49,19 +49,19 @@ Usage: $1 COMMAND CONFIGFILE [OPTIONS]
 
 Example:
   # build the builder docker image first
-  ./builder.sh build-docker-image example-glinet-gl-ar750.conf
+  $PROG build-docker-image example-glinet-gl-ar750.conf
 
   # now build the OpenWrt image, overriding output and rootfs locations
-  ./builder.sh build example-glinet-gl-ar750.conf -o output -f myrootfs
+  $PROG build example-glinet-gl-ar750.conf -o output -f myrootfs
 
   # show available profiles for the arch/target/subtarget of the given configuration
-  ./builder.sh profiles example-glinet-gl-ar750.conf
+  $PROG profiles example-glinet-gl-ar750.conf
 
   # pass additional docker options: mount downloads to host directory during build
-  ./builder.sh build example-glinet-gl-ar750.conf --docker-opts "-v=$(pwd)/dl:/lede/imagebuilder/dl:z"
+  $PROG build example-glinet-gl-ar750.conf --docker-opts "-v=$(pwd)/dl:/lede/imagebuilder/dl:z"
 
   # use nix to build the OpenWrt image, no need to build a container first
-  ./builder.sh build example-x86_64.conf --nix
+  $PROG build example-x86_64.conf --nix
 EOT
     exit 0
 }
