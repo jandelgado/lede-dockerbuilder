@@ -222,7 +222,7 @@ function ensure_dirs {
 function ensure_nix_env {
     local builder_dir=$1
     local builder_url=$2
-    download_builder "$builder_dir" "$(builder_url)"
+    download_builder "$builder_dir" "$builder_url"
 }
 
 # parse cli args, can override config file params
