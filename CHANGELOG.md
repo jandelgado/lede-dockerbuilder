@@ -1,5 +1,9 @@
 # Changelog for lede-dockerbuilder
 
+## v3.2 [2022-08-07]
+
+* build image using nix-shell, which does not require a container
+
 ## v3.1 [2022-05-03]
 
 * Upgrade to OpenWrt 21.02.3
