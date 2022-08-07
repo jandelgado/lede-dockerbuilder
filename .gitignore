@@ -1,4 +1,6 @@
 output/
+.build/
 rootfs-overlay/*
 rootfs-overlay/!README
 *~
+

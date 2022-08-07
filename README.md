@@ -1,6 +1,6 @@
 # Containerized OpenWrt image builder
 
-![Build Status](https://github.com/jandelgado/lede-dockerbuilder/workflows/test/badge.svg)
+[![test](https://github.com/jandelgado/lede-dockerbuilder/actions/workflows/test.yml/badge.svg)](https://github.com/jandelgado/lede-dockerbuilder/actions/workflows/test.yml)
 
 <!-- vim-markdown-toc GFM -->
 
@@ -8,8 +8,10 @@
     * [Note](#note)
 * [Why](#why)
 * [How](#how)
+    * [Using docker](#using-docker)
+    * [Using nix-shell](#using-nix-shell)
     * [Usage](#usage)
-        * [Container runtime](#container-runtime)
+        * [Builder runtime](#builder-runtime)
     * [Configuration file](#configuration-file)
     * [File system overlay](#file-system-overlay)
     * [Example directory structure](#example-directory-structure)
@@ -25,16 +27,16 @@
 ## What
 
 Easily and quickly build [OpenWrt](https://openwrt.org/) custom images (e.g.
-for your embedded device our Raspberry PI) using a self-contained docker
-container and the [OpenWrt image
+for your embedded device or a Raspberry PI) using a self-contained docker
+container or a [nix-shell](https://nixos.wiki/wiki/Development_environment_with_nix-shell) and the [OpenWrt image
 builder](https://openwrt.org/docs/guide-user/additional-software/imagebuilder).
-On the builder host, Docker or podman/buildah (for dockerless operation) is the
+On the builder host, Docker, podman/buildah (for dockerless operation) or nix-shell is the
 only requirement. Supports latest OpenWrt release (21.02.3) and upcomig 22.03.x
 release ([example](example-x86_64-22.03.x.conf)).
 
 ### Note
 
-The OpenWrt-dockerbuilder uses pre-compiled packages to build the final image. 
+The OpenWrt imagebuilder uses pre-compiled packages to build the final image. 
 Go [here](https://github.com/jandelgado/lede-dockercompiler) if you are looking 
 for a docker images to compile OpenWrt completely from source.
 
@@ -42,10 +44,12 @@ for a docker images to compile OpenWrt completely from source.
 
 * customized and optimized (size) images with your personal configurations
 * full automatic image creation (could be run in CI)
-* reproducable results
-* easy configuration, fast build (in minutes)
+* repeatable builds
+* easy configuration, fast build
 
 ## How
+
+### Using docker
 
 ```
 $ git clone https://github.com/jandelgado/lede-dockerbuilder.git
@@ -60,47 +64,62 @@ the actual image builder. The resulting docker image is per default tagged with
 will afterwards run a container, which builds the actual OpenWrt image. The
 final OpenWrt image will be available in the `output/` directory.
 
+### Using nix-shell
+
+```
+$ git clone https://github.com/jandelgado/lede-dockerbuilder.git
+$ cd lede-dockerbuilder
+$ ./builder.sh build example-nexx-wt3020.conf --nix
+```
+
+Using `nix-shell` does not require building a container image or starting a 
+container first, therefore it is usually faster.
+
 ### Usage
 
 ```
 Dockerized LEDE/OpenWRT image builder.
 
-Usage: ./builder.sh COMMAND CONFIGFILE [OPTIONS]
+Usage: $1 COMMAND CONFIGFILE [OPTIONS]
   COMMAND is one of:
     build-docker-image - build the docker image (run once first)
-    profiles           - start container and show avail profiles for
-                         current configuration
+    profiles           - show available profiles for current configuration
     build              - start container and build the LEDE/OpenWRT image
-    shell              - start shell in docker container
+    shell              - start shell in the build dir 
   CONFIGFILE           - configuraton file to use
 
   OPTIONS:
-  -o OUTPUT_DIR        - output directory (default /home/paco/src/lede-dockerbuilder/output)
+  -o OUTPUT_DIR        - output directory (default $OUTPUT_DIR)
   --docker-opts OPTS   - additional options to pass to docker run
                          (can occur multiple times)
-  -f ROOTFS_OVERLAY    - rootfs-overlay directory (default /home/paco/src/lede-dockerbuilder/rootfs-overlay)
+  -f ROOTFS_OVERLAY    - rootfs-overlay directory (default $ROOTFS_OVERLAY)
   --sudo               - call container tool with sudo
   --podman             - use buildah and podman to build and run container
   --nerdctl            - use nerdctl to build and run container
   --docker             - use docker to build and run container (default)
+  --nix                - build using nix-shell
 
   command line options -o, -f override config file settings.
 
 Example:
   # build the builder docker image first
-  ./builder.sh build-docker-image example.conf
+  ./builder.sh build-docker-image example-glinet-gl-ar750.conf
 
-  # now build the OpenWrt image
-  ./builder.sh build example.conf -o output -f myrootfs
+  # now build the OpenWrt image, overriding output and rootfs locations
+  ./builder.sh build example-glinet-gl-ar750.conf -o output -f myrootfs
 
-  # show available profiles
-  ./builder.sh profiles example.conf
+  # show available profiles for the arch/target/subtarget of the given configuration
+  ./builder.sh profiles example-glinet-gl-ar750.conf
 
-  # mount downloads to host directory during build
-  ./builder.sh build example-nexx-wt3020.conf --docker-opts "-v=$(pwd)/dl:/lede/imagebuilder/dl:z"
+  # pass additional docker options: mount downloads to host directory during build
+  ./builder.sh build example-glinet-gl-ar750.conf --docker-opts "-v=$(pwd)/dl:/lede/imagebuilder/dl:z"
+
+  # use nix to build the OpenWrt image, no need to build a container first
+  ./builder.sh build example-x86_64.conf --nix
+
 ```
 
-#### Container runtime
+#### Builder runtime
 
 * By default docker will be used to build and run the container.
 * When called with `--podman` option, lede-dockerbuilder will use buildah and
@@ -108,6 +127,14 @@ Example:
 * When called with `--nerdctl` option, lede-dockerbuilder will use nerdctl to
   build and run the container.
 * Use the `--sudo` option to run the container command with sudo.
+* Use the `--nix` option to run the build in a [nix-shell](shell.nix) (instead
+  of using a container runtime)
+
+When using a container builder like docker, the build container will be newly
+created on every build. When using the nix builder, the build environment will
+be reused, which is ususally faster. By default, the nix build environments are
+installed in the `.build` directory, relative to the `builder.sh` script. This
+can be overriden with the `NIX_BUILD_DIR` environment variable.
 
 ### Configuration file
 
@@ -251,7 +278,7 @@ These examples evolved from images I use myself.
 * [image with samba, vsftpd and encrypted usb disk for
   NEXX-WT3020](example-nexx-wt3020.conf). Is the predessor of ...
 * [image with samba, vsftpd and encrypted usb disk for
-  GINET-GL-M300N V2](example-ginet-gl-mt300n-v2.conf). This is my travel router
+  GINET-GL-M300N V2](example-glinet-gl-mt300n-v2.conf). This is my travel router
   setup where I have an encrypted USB disk connected to the router.
 
 To build an example run `./builder.sh build <config-file>`, e.g.
@@ -308,8 +335,8 @@ LEDE_RELEASE=snapshots
 LEDE_BUILDER_URL="https://downloads.openwrt.org/$LEDE_RELEASE/targets/$LEDE_TARGET/$LEDE_SUBTARGET/openwrt-imagebuilder-$LEDE_TARGET-$LEDE_SUBTARGET.Linux-x86_64.tar.xz" 
 ```
 
-See the [Raspberry Pi 4 example](example-rpi4.conf) which builds an image for
-the raspi 4, which is (as of may 2020) only available on the snapshots branch.
+See the [this example](example-x86_64-snapshot.conf) which builds an x86_64
+image using the snapshot release.
 
 ## Author
 
