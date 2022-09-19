@@ -300,10 +300,11 @@ x86_64 based OpenWrt image which can also be run in qemu, e.g. if you need
 a virtual router/firewall.
 
 First build the image with `builder.sh build example-x86_64.conf`, then unpack
-the resulting image with `gunzip output/openwrt-19.07.x-x86-64-combined-ext4.img.gz`.
-Now the image can be started with qemu:
+the resulting image with e.g. `gunzip
+output/openwrt-22.03.0-x86-64-generic-ext4-combined.img.gz`.  Finally the image
+can be started with qemu (or simply use [run_in_qemu.sh](etc/run_in_qemu.sh))
 
-```
+```shell
 qemu-system-x86_64 \
     -enable-kvm \
     -nographic \
