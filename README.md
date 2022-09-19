@@ -31,8 +31,7 @@ for your embedded device or a Raspberry PI) using a self-contained docker
 container or a [nix-shell](https://nixos.wiki/wiki/Development_environment_with_nix-shell) and the [OpenWrt image
 builder](https://openwrt.org/docs/guide-user/additional-software/imagebuilder).
 On the builder host, Docker, podman/buildah (for dockerless operation) or nix-shell is the
-only requirement. Supports latest OpenWrt release (21.02.3) and upcomig 22.03.x
-release ([example](example-x86_64-22.03.x.conf)).
+only requirement. Supports latest OpenWrt release (22.03.0).
 
 ### Note
 
@@ -188,7 +187,7 @@ encrypted USB disk attached so I can use it as a simple NAS with samba and ftp:
 ```
 # LEDE profile to use: NEXX WT3020
 LEDE_PROFILE=nexx_wt3020-8m
-LEDE_RELEASE=21.02.3
+LEDE_RELEASE=22.03.0
 LEDE_TARGET=ramips
 LEDE_SUBTARGET=mt7620
 
@@ -278,8 +277,11 @@ These examples evolved from images I use myself.
 * [image with samba, vsftpd and encrypted usb disk for
   NEXX-WT3020](example-nexx-wt3020.conf). Is the predessor of ...
 * [image with samba, vsftpd and encrypted usb disk for
-  GINET-GL-M300N V2](example-glinet-gl-mt300n-v2.conf). This is my travel router
-  setup where I have an encrypted USB disk connected to the router.
+  GINET-GL-M300N V2](example-glinet-gl-mt300n-v2.conf). Is the predessor of ...
+* [image with samba, vsftpd, adblock and encrypted usb disk for
+  GINET-GL-AR750](example-glinet-gl-ar750.conf). This is my travel router
+  setup where I have an encrypted USB disk connected to the router, accessible
+  through SMB or FTP and have an adblocker running. Useful if you travel much.
 
 To build an example run `./builder.sh build <config-file>`, e.g.
 
