@@ -1,5 +1,10 @@
 # Changelog for lede-dockerbuilder
 
+## v3.3 [2022-09-19]
+
+* Upgrade to OpenWrt 22.03.0
+* add script to run x86_64 image in qemu
+
 ## v3.2 [2022-08-07]
 
 * build image using nix-shell, which does not require a container
