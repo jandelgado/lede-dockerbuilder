@@ -196,17 +196,16 @@ LEDE_SUBTARGET=mt7620
 # include all packages to build a mobile NAS supporting disk encryption:
 # ksmbd (samba4 is too large now for the WT3020's 8MB), cryptsetup.
 # see https://github.com/namjaejeon/ksmbd-tools for ksmbd info.
-LEDE_PACKAGES="ksmbd-server ksmbd-utils lsblk iwinfo tcpdump block-mount\
-    kmod-usb-storage-uas kmod-scsi-core kmod-fs-ext4 ntfs-3g\
-    kmod-nls-cp437 kmod-nls-iso8859-1 cryptsetup kmod-crypto-xts\
+LEDE_PACKAGES="ksmbd-server ksmbd-utils lsblk block-mount\
+    kmod-usb-storage-uas kmod-scsi-core ntfs-3g\
+    kmod-nls-iso8859-1 cryptsetup kmod-crypto-xts\
     kmod-mt76 kmod-usb2 kmod-usb-ohci kmod-usb-core kmod-dm kmod-crypto-ecb\
     kmod-crypto-misc kmod-crypto-cbc kmod-crypto-crc32c kmod-crypto-hash\
     kmod-crypto-user\
-    -ppp -kmod-ppp -kmod-pppoe -kmod-pppox -ppp-mod-pppoe\
+    -ppp -kmod-ppp -kmod-pppoe -kmod-pppox -ppp-mod-pppoe -opkg\
     -ip6tables -odhcp6c -kmod-ipv6 -kmod-ip6tables -odhcpd-ipv6only"
 
 # optionally override OUTPUT_DIR and ROOTFS_OVERLAY directory location here
-
 ```
 
 ### File system overlay
