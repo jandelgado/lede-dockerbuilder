@@ -8,7 +8,6 @@ mkShell {
       gcc
       unzip
       utillinux
-      python2
       python3
       rsync
       patch
