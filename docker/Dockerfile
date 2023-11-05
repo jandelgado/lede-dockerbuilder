@@ -1,4 +1,4 @@
-FROM ubuntu:22.04.3 as base
+FROM ubuntu:22.04 as base
 LABEL maintainer "Jan Delgado <jdelgado@gmx.net>"
 
 RUN    apt-get update\
