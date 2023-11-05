@@ -15,11 +15,10 @@ FROM base
 # install the image builder. use tmpfile so that tar's compression
 # autodetection works.
 ARG BUILDER_URL
-ADD $BUILDER_URL /tmp/imagebuilder
 
 RUN    mkdir -p /lede/imagebuilder\
-    && tar xf /tmp/imagebuilder --strip-components=1 -C /lede/imagebuilder\
-    && rm -f /tmp/imagebuilder 
+    && wget -q "$BUILDER_URL" -O /tmp/imagebuilder && tar xvf /tmp/imagebuilder --strip-components=1 -C /lede/imagebuilder \
+    && rm -f /tmp/imagebuilder
 
 WORKDIR "/lede/imagebuilder"
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
