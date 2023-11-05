@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:22.04.3 as base
 LABEL maintainer "Jan Delgado <jdelgado@gmx.net>"
 
 RUN    apt-get update\
@@ -9,6 +9,8 @@ RUN    apt-get update\
 
 ADD etc/entrypoint.sh /usr/local/bin/
 RUN chmod 755 /usr/local/bin/entrypoint.sh 
+
+FROM base
 
 # install the image builder. use tmpfile so that tar's compression
 # autodetection works.
