@@ -31,7 +31,7 @@ for your embedded device or a Raspberry PI) using a self-contained docker
 container or a [nix-shell](https://nixos.wiki/wiki/Development_environment_with_nix-shell) and the [OpenWrt image
 builder](https://openwrt.org/docs/guide-user/additional-software/imagebuilder).
 On the builder host, Docker, podman/buildah (for dockerless operation) or nix-shell is the
-only requirement. Supports latest OpenWrt release (22.03.4).
+only requirement. Supports latest OpenWrt release (23.05.0).
 
 ### Note
 
@@ -187,7 +187,7 @@ encrypted USB disk attached so I can use it as a simple NAS with samba and ftp:
 ```
 # LEDE profile to use: NEXX WT3020
 LEDE_PROFILE=nexx_wt3020-8m
-LEDE_RELEASE=22.03.4
+LEDE_RELEASE=23.05.0
 LEDE_TARGET=ramips
 LEDE_SUBTARGET=mt7620
 
@@ -196,7 +196,7 @@ LEDE_SUBTARGET=mt7620
 # include all packages to build a mobile NAS supporting disk encryption:
 # ksmbd (samba4 is too large now for the WT3020's 8MB), cryptsetup.
 # see https://github.com/namjaejeon/ksmbd-tools for ksmbd info.
-LEDE_PACKAGES="ksmbd-server ksmbd-utils lsblk block-mount\
+LEDE_PACKAGES="ksmbd-server lsblk block-mount\
     kmod-usb-storage-uas kmod-scsi-core ntfs-3g\
     kmod-nls-iso8859-1 cryptsetup kmod-crypto-xts\
     kmod-mt76 kmod-usb2 kmod-usb-ohci kmod-usb-core kmod-dm kmod-crypto-ecb\
@@ -300,7 +300,7 @@ a virtual router/firewall.
 
 First build the image with `builder.sh build example-x86_64.conf`, then unpack
 the resulting image with e.g. `gunzip
-output/openwrt-22.03.4-x86-64-generic-ext4-combined.img.gz`.  Finally the image
+output/openwrt-23.05.0-x86-64-generic-ext4-combined.img.gz`.  Finally the image
 can be started with qemu (or simply use [run_in_qemu.sh](etc/run_in_qemu.sh))
 
 ```shell

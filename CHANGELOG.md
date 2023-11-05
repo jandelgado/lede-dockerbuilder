@@ -1,5 +1,10 @@
 # Changelog for lede-dockerbuilder
 
+## v3.5 [2923-11-05]
+
+* Upgrade to OpenWrt 23.05.0 & make examples run again
+* Ugrade docker base image
+
 ## v3.4 [2023-04-19]
 
 * Upgrade to OpenWrt 22.03.4

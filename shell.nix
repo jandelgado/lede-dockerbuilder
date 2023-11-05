@@ -2,6 +2,7 @@ with (import <nixpkgs> {});
 mkShell {
   name = "OpenWRT builder";
   buildInputs = [
+      pkgs.cacert
       git
       perl
       gnumake
@@ -15,7 +16,7 @@ mkShell {
       file
       subversion
       which
-      pkgconfig
+      pkg-config
       openssl
       systemd
       binutils
