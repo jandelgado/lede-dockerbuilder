@@ -31,7 +31,7 @@ for your embedded device or a Raspberry PI) using a self-contained docker
 container or a [nix-shell](https://nixos.wiki/wiki/Development_environment_with_nix-shell) and the [OpenWrt image
 builder](https://openwrt.org/docs/guide-user/additional-software/imagebuilder).
 On the builder host, Docker, podman/buildah (for dockerless operation) or nix-shell is the
-only requirement. Supports latest OpenWrt release (23.05.0).
+only requirement. Supports latest OpenWrt release (23.05.x).
 
 ### Note
 
