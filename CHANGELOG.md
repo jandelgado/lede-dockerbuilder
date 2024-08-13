@@ -1,6 +1,11 @@
 # Changelog for lede-dockerbuilder
 
-## v3.5 [2923-11-05]
+## v3.6 [2024-08-13]
+
+* Upgrade to OpenWrt 23.05.4
+* pin nix package version
+
+## v3.5 [2023-11-05]
 
 * Upgrade to OpenWrt 23.05.0 & make examples run again
 * Ugrade docker base image
