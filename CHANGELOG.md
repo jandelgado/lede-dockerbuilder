@@ -1,5 +1,9 @@
 # Changelog for lede-dockerbuilder
 
+## v3.7 [2024-11-10]
+
+* Upgrade to OpenWrt 23.05.5
+
 ## v3.6 [2024-08-13]
 
 * Upgrade to OpenWrt 23.05.4
@@ -13,7 +17,7 @@
 ## v3.4 [2023-04-19]
 
 * Upgrade to OpenWrt 22.03.4
- 
+
 ## v3.3 [2022-09-19]
 
 * Upgrade to OpenWrt 22.03.0
@@ -55,11 +59,11 @@
 * add new `profile` option to show available profiles
 * ci uses matrix build now
 
-## v2.7 [2021-03-17] 
+## v2.7 [2021-03-17]
 
 * bump to OpenWrt 19.07.7
 
-## v2.6 [2021-02-17] 
+## v2.6 [2021-02-17]
 
 * bump to OpenWrt 19.07.6
 * bump alpine in builder image to 3.13
@@ -82,7 +86,7 @@
 ## v2.2 [2020-01-24]
 
 * examples upgraded to use 19.07.0
- 
+
 ## v2.1 [2019-12-01]
 
 * new environment variable `REPOSITORIES_CONF` added to specify custom
@@ -92,7 +96,7 @@
 ## v2.0 [2019-07-28]
 
 * add new option `--dockerless` to allow dockerless operation using buildah
-  and podman. 
+  and podman.
 * `build` option does now longer implicitly builds the docker image. Must now
   explicitly call `build-docker-image` before building an OpenWrt image.
 * minor optimizations in Dockerfile
@@ -104,7 +108,7 @@
 ## v1.4 [2019-03-29]
 
 * build container now uses Alpine 3.9 as base image
-* examples upgraded to use 18.06.2 
+* examples upgraded to use 18.06.2
 
 ## v1.3 [2019-02-02]
 
@@ -119,7 +123,7 @@
 * output dir will be automatically created
 * minor changes
 
-## v1.1 [2018-08-02] 
+## v1.1 [2018-08-02]
 
 * Support for [OpenWRT 18.06](https://openwrt.org/releases/18.06/notes-18.06.0) added.
   Since LEDE and OpenWRT projects merged, all examples will now use OpenWRT.
