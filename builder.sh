@@ -194,7 +194,7 @@ EOT
 # return default LEDE_BUILDER_URL if not overriden in configuration file
 function builder_url {
     if [ -z "${LEDE_BUILDER_URL+x}" ]; then
-        echo "https://downloads.openwrt.org/releases/$LEDE_RELEASE/targets/$LEDE_TARGET/$LEDE_SUBTARGET/openwrt-imagebuilder-$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET.Linux-x86_64.tar.xz"
+        echo "https://downloads.openwrt.org/releases/$LEDE_RELEASE/targets/$LEDE_TARGET/$LEDE_SUBTARGET/openwrt-imagebuilder-$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET.Linux-x86_64.tar.zst"
         return
     fi
     echo "$LEDE_BUILDER_URL"
