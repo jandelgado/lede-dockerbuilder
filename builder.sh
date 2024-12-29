@@ -301,13 +301,15 @@ function dispatch_command {
              ;;
          *)
             usage "$0"
-            exit 0 
+            # shellcheck disable=2317
+            exit 0
             ;;
     esac
 }
 
 if [ $# -lt 2 ]; then
     usage "$0"
+    # shellcheck disable=2317
     exit 1
 fi
 
