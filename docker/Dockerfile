@@ -1,10 +1,10 @@
-FROM ubuntu:22.04 as base
-LABEL maintainer "Jan Delgado <jdelgado@gmx.net>"
+FROM ubuntu:24.04 AS base
+LABEL maintainer="Jan Delgado <jdelgado@gmx.net>"
 
 RUN    apt-get update\
     && DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential\
          libncurses5-dev libncursesw5-dev zlib1g-dev gawk git gettext libssl-dev\
-         xsltproc rsync wget unzip python3 python3-distutils file\
+         xsltproc rsync wget unzip python3 file zstd\
     && rm -rf /var/lib/apt/lists/*
 
 ADD etc/entrypoint.sh /usr/local/bin/
