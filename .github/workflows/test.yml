@@ -11,10 +11,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          lfs: true
       - name: shellcheck
         run: shellcheck builder.sh
   testnix:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     name: test nix builds
     strategy:
       matrix:
@@ -22,6 +25,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          lfs: true
       - name: test build example
         run: |
           sh <(curl -L https://nixos.org/nix/install) --no-daemon
@@ -32,27 +38,31 @@ jobs:
         run: |
           ./.test/run_all.sh example-${{ matrix.example }}.conf output/
   testcontainer:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    env:
+      xDOCKER_BUILDKIT: 0
+      xBUILDKIT: 0
+      x_DOCKER_OPTS: --security-opt seccomp=unconfined --cap-add=SYS_ADMIN
     name: test container builds
     strategy:
       matrix:
         example: ["x86_64", "rpi4", "glinet-gl-ar750", "glinet-gl-mt300n-v2", "nexx-wt3020", "rpi2", "wrt1043nd"]
-        option: ["--docker", "--podman"]
-        sudo: ["", "--sudo"]
+        option: ["--docker --sudo", "--podman", "--podman --sudo"]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: test build example
         run: |
-          if [ "${{ matrix.option }}" == "--podman" ]; then
+          if [[ "${{ matrix.option }}" =~ "podman" ]]; then
             sudo apt-get -y update
             sudo apt-get -y install podman
           fi
           mkdir -p output
+          env | grep -i DOCKER
           time ./builder.sh build-docker-image \
-                  example-${{ matrix.example }}.conf ${{ matrix.option }}  ${{ matrix.sudo }} &&\
+                  example-${{ matrix.example }}.conf ${{ matrix.option }}  &&\
           time ./builder.sh build \
-                  example-${{ matrix.example }}.conf ${{ matrix.option }} ${{ matrix.sudo }}
+                  example-${{ matrix.example }}.conf ${{ matrix.option }}
       - name: check artefacts
         run: |
           ./.test/run_all.sh example-${{ matrix.example }}.conf output/

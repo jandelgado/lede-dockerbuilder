@@ -104,6 +104,7 @@ function run_cmd_in_container {
         -v "$(abspath "$OUTPUT_DIR")":/lede/output \
         "${repositories_volume[@]}" \
         ${DOCKER_OPTS[@]} \
+        ${_DOCKER_OPTS:-} \
         --rm "$(image_tag)" bash -c "$*"
 }
 

@@ -8,7 +8,7 @@ RUN    apt-get update\
     && rm -rf /var/lib/apt/lists/*
 
 ADD etc/entrypoint.sh /usr/local/bin/
-RUN chmod 755 /usr/local/bin/entrypoint.sh 
+RUN chmod 755 /usr/local/bin/entrypoint.sh
 
 FROM base
 
@@ -17,7 +17,9 @@ FROM base
 ARG BUILDER_URL
 
 RUN    mkdir -p /lede/imagebuilder\
-    && wget -q "$BUILDER_URL" -O /tmp/imagebuilder && tar xvf /tmp/imagebuilder --strip-components=1 -C /lede/imagebuilder \
+    && wget -q "$BUILDER_URL" -O /tmp/imagebuilder && \
+       tar xvf /tmp/imagebuilder\
+               --strip-components=1 -C /lede/imagebuilder \
     && rm -f /tmp/imagebuilder
 
 WORKDIR "/lede/imagebuilder"
