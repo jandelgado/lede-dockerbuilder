@@ -192,8 +192,8 @@ RUNTIME...........: $runtime
 EOT
 }
 
-# tests if given version is less then provided version in semver, e.g.
-# version_ge_than("24.0.10", "23") -> false
+# tests if given version is at least provided reference version.
+# version_ge_than("23.05.1", "24") -> false
 # version_ge_than("24.0.10", "24") -> true
 function version_ge_than { [ "${1%%.*}" -ge "$2" ]; }
 
