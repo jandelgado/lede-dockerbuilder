@@ -5,19 +5,19 @@
 <!-- vim-markdown-toc GFM -->
 
 * [What](#what)
-    * [Note](#note)
+  * [Note](#note)
 * [Why](#why)
 * [How](#how)
-    * [Using docker](#using-docker)
-    * [Using nix-shell](#using-nix-shell)
-    * [Usage](#usage)
-        * [Builder runtime](#builder-runtime)
-    * [Configuration file](#configuration-file)
-    * [File system overlay](#file-system-overlay)
-    * [Example directory structure](#example-directory-structure)
-        * [Debugging](#debugging)
+  * [Using docker](#using-docker)
+  * [Using nix-shell](#using-nix-shell)
+  * [Usage](#usage)
+    * [Builder runtime](#builder-runtime)
+  * [Configuration file](#configuration-file)
+  * [File system overlay](#file-system-overlay)
+  * [Example directory structure](#example-directory-structure)
+    * [Debugging](#debugging)
 * [Examples](#examples)
-    * [Building a x86_64 image and running it in qemu](#building-a-x86_64-image-and-running-it-in-qemu)
+  * [Building a x86_64 image and running it in qemu](#building-a-x86_64-image-and-running-it-in-qemu)
 * [Building an OpenWrt snapshot release](#building-an-openwrt-snapshot-release)
 * [Author](#author)
 * [License](#license)
@@ -31,12 +31,12 @@ for your embedded device or a Raspberry PI) using a self-contained docker
 container or a [nix-shell](https://nixos.wiki/wiki/Development_environment_with_nix-shell) and the [OpenWrt image
 builder](https://openwrt.org/docs/guide-user/additional-software/imagebuilder).
 On the builder host, Docker, podman/buildah (for dockerless operation) or nix-shell is the
-only requirement. Supports latest OpenWrt release (23.05.x).
+only requirement. Supports latest OpenWrt release (24.10.x).
 
 ### Note
 
-The OpenWrt imagebuilder uses pre-compiled packages to build the final image. 
-Go [here](https://github.com/jandelgado/lede-dockercompiler) if you are looking 
+The OpenWrt imagebuilder uses pre-compiled packages to build the final image.
+Go [here](https://github.com/jandelgado/lede-dockercompiler) if you are looking
 for a docker images to compile OpenWrt completely from source.
 
 ## Why
@@ -50,7 +50,7 @@ for a docker images to compile OpenWrt completely from source.
 
 ### Using docker
 
-```
+```text
 $ git clone https://github.com/jandelgado/lede-dockerbuilder.git
 $ cd lede-dockerbuilder
 $ ./builder.sh build-docker-image example-nexx-wt3020.conf
@@ -71,7 +71,7 @@ $ cd lede-dockerbuilder
 $ ./builder.sh build example-nexx-wt3020.conf --nix
 ```
 
-Using `nix-shell` does not require building a container image or starting a 
+Using `nix-shell` does not require building a container image or starting a
 container first, therefore it is usually faster.
 
 ### Usage
@@ -84,7 +84,7 @@ Usage: $1 COMMAND CONFIGFILE [OPTIONS]
     build-docker-image - build the docker image (run once first)
     profiles           - show available profiles for current configuration
     build              - start container and build the LEDE/OpenWRT image
-    shell              - start shell in the build dir 
+    shell              - start shell in the build dir
   CONFIGFILE           - configuraton file to use
 
   OPTIONS:
@@ -192,7 +192,7 @@ LEDE_TARGET=ramips
 LEDE_SUBTARGET=mt7620
 
 # list packages to include in LEDE image. prepend packages to deinstall with "-".
-# 
+#
 # include all packages to build a mobile NAS supporting disk encryption:
 # ksmbd (samba4 is too large now for the WT3020's 8MB), cryptsetup.
 # see https://github.com/namjaejeon/ksmbd-tools for ksmbd info.
@@ -284,8 +284,8 @@ These examples evolved from images I use myself.
 
 To build an example run `./builder.sh build <config-file>`, e.g.
 
-```shell
-$ ./builder.sh build example-rpi2.conf 
+```text
+$ ./builder.sh build example-rpi2.conf
 ```
 
 The resulting image can be found in the `output/` directory. The [OpenWrt
@@ -295,36 +295,35 @@ describes how to flash the new image in detail.
 ### Building a x86_64 image and running it in qemu
 
 The [example-x86_64.conf](example-x86_64.conf) file can be used to build a
-x86_64 based OpenWrt image which can also be run in qemu, e.g. if you need
+x86_64 based OpenWrt image which can also be run in qemu, e.g., if you need
 a virtual router/firewall.
 
 First build the image with `builder.sh build example-x86_64.conf`, then unpack
 the resulting image with e.g. `gunzip
-output/openwrt-23.05.0-x86-64-generic-ext4-combined.img.gz`.  Finally the image
+output/openwrt-24.10.0-x86-64-generic-ext4-combined.img.gz`.  Finally the image
 can be started with qemu (or simply use [run_in_qemu.sh](etc/run_in_qemu.sh))
 
-```shell
+```text
 qemu-system-x86_64 \
     -enable-kvm \
     -nographic \
     -device ide-hd,drive=d0,bus=ide.0 \
-    -netdev user,id=hn0 \
-    -device virtio-net-pci,netdev=hn0,id=wan \
-    -netdev user,id=hn1,hostfwd=tcp::5555-:22001 \
-    -device virtio-net-pci,netdev=hn1,id=lan \
-    -drive id=d0,if=none,file=output/openwrt-19.07.0-x86-64-combined-ext4.img
+    -device virtio-net-pci,netdev=hn0,id=lan \
+    -netdev user,id=hn0,net=192.168.1.0/24,host=192.168.1.2,hostfwd=tcp::1122-192.168.1.1:22,hostfwd=tcp::8443-192.168.1.1:443\
+    -device virtio-net-pci,netdev=hn1,id=wan \
+    -netdev user,id=hn1\
+    -drive id=d0,if=none,file="$IMG"
 ```
-
-The `hostfwd=...` part can be omitted and is used in case you redirect port
-22001 on your WAN adapter to port 22 of the LAN adapter, in case you want to
-access SSH in the VM from your qemu-host. Check the `/etc/config/firewall` file
-for details.
 
 Qemu will assign the IP address `10.0.2.15/24` to the `WAN` interface (`eth1`)
 and OpenWrt the address `192.168.1.1/24` to the `LAN` (`br-lan` bridge with
 `eth0`) interface.
 
-Note: press `CTRL-A X` to exit qemu.
+Port `1122` will be forwarded to the OpenWrt VMs port `22` (ssh), and port
+`8443` will be forwarded to port `443` , allowing to access luci using a
+web browser from the host under `https://localhost:8443`.
+
+Note: inside Qemu, press `CTRL-a` + `x` to exit.
 
 ## Building an OpenWrt snapshot release
 
@@ -332,9 +331,9 @@ To build a [snapshot](https://downloads.openwrt.org/snapshots) release, set
 `LEDE_RELEASE` to `snapshots` and let `LEDE_BUILDER_URL` point to the image
 builder in the snapshot dir, e.g.
 
-```
+```text
 LEDE_RELEASE=snapshots
-LEDE_BUILDER_URL="https://downloads.openwrt.org/$LEDE_RELEASE/targets/$LEDE_TARGET/$LEDE_SUBTARGET/openwrt-imagebuilder-$LEDE_TARGET-$LEDE_SUBTARGET.Linux-x86_64.tar.xz" 
+LEDE_BUILDER_URL="https://downloads.openwrt.org/$LEDE_RELEASE/targets/$LEDE_TARGET/$LEDE_SUBTARGET/openwrt-imagebuilder-$LEDE_TARGET-$LEDE_SUBTARGET.Linux-x86_64.tar.xz"
 ```
 
 See the [this example](example-x86_64-snapshot.conf) which builds an x86_64
