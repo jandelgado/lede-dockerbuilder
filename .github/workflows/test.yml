@@ -14,7 +14,7 @@ jobs:
       - name: shellcheck
         run: shellcheck builder.sh
   testnix:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     name: test nix builds
     strategy:
       matrix:
@@ -32,27 +32,26 @@ jobs:
         run: |
           ./.test/run_all.sh example-${{ matrix.example }}.conf output/
   testcontainer:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     name: test container builds
     strategy:
       matrix:
         example: ["x86_64", "rpi4", "glinet-gl-ar750", "glinet-gl-mt300n-v2", "nexx-wt3020", "rpi2", "wrt1043nd"]
-        option: ["--docker", "--podman"]
-        sudo: ["", "--sudo"]
+        option: ["--docker --sudo", "--podman", "--podman --sudo"]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: test build example
         run: |
-          if [ "${{ matrix.option }}" == "--podman" ]; then
+          if [[ "${{ matrix.option }}" =~ "podman" ]]; then
             sudo apt-get -y update
             sudo apt-get -y install podman
           fi
           mkdir -p output
           time ./builder.sh build-docker-image \
-                  example-${{ matrix.example }}.conf ${{ matrix.option }}  ${{ matrix.sudo }} &&\
+                  example-${{ matrix.example }}.conf ${{ matrix.option }}  &&\
           time ./builder.sh build \
-                  example-${{ matrix.example }}.conf ${{ matrix.option }} ${{ matrix.sudo }}
+                  example-${{ matrix.example }}.conf ${{ matrix.option }}
       - name: check artefacts
         run: |
           ./.test/run_all.sh example-${{ matrix.example }}.conf output/

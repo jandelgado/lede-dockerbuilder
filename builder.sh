@@ -104,6 +104,7 @@ function run_cmd_in_container {
         -v "$(abspath "$OUTPUT_DIR")":/lede/output \
         "${repositories_volume[@]}" \
         ${DOCKER_OPTS[@]} \
+        ${_DOCKER_OPTS:-} \
         --rm "$(image_tag)" bash -c "$*"
 }
 
@@ -191,10 +192,21 @@ RUNTIME...........: $runtime
 EOT
 }
 
+# tests if given version is at least provided reference version.
+# version_ge_than("23.05.1", "24") -> false
+# version_ge_than("24.0.10", "24") -> true
+function version_ge_than { [ "${1%%.*}" -ge "$2" ]; }
+
 # return default LEDE_BUILDER_URL if not overriden in configuration file
 function builder_url {
+    # using .zst since OpenWrt 24, .xz before
     if [ -z "${LEDE_BUILDER_URL+x}" ]; then
-        echo "https://downloads.openwrt.org/releases/$LEDE_RELEASE/targets/$LEDE_TARGET/$LEDE_SUBTARGET/openwrt-imagebuilder-$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET.Linux-x86_64.tar.xz"
+        if version_ge_than "$LEDE_RELEASE" "24"; then
+            local ext="zst"
+        else
+            local ext="xz"
+        fi
+        echo "https://downloads.openwrt.org/releases/$LEDE_RELEASE/targets/$LEDE_TARGET/$LEDE_SUBTARGET/openwrt-imagebuilder-$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET.Linux-x86_64.tar.$ext"
         return
     fi
     echo "$LEDE_BUILDER_URL"
@@ -301,13 +313,15 @@ function dispatch_command {
              ;;
          *)
             usage "$0"
-            exit 0 
+            # shellcheck disable=2317
+            exit 0
             ;;
     esac
 }
 
 if [ $# -lt 2 ]; then
     usage "$0"
+    # shellcheck disable=2317
     exit 1
 fi
 
