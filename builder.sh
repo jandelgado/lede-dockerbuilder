@@ -192,10 +192,21 @@ RUNTIME...........: $runtime
 EOT
 }
 
+# tests if given version is less then provided version in semver, e.g.
+# version_ge_than("24.0.10", "23") -> false
+# version_ge_than("24.0.10", "24") -> true
+function version_ge_than { [ "${1%%.*}" -ge "$2" ]; }
+
 # return default LEDE_BUILDER_URL if not overriden in configuration file
 function builder_url {
+    # using .zst since OpenWrt 24, .xz before
     if [ -z "${LEDE_BUILDER_URL+x}" ]; then
-        echo "https://downloads.openwrt.org/releases/$LEDE_RELEASE/targets/$LEDE_TARGET/$LEDE_SUBTARGET/openwrt-imagebuilder-$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET.Linux-x86_64.tar.zst"
+        if version_ge_than "$LEDE_RELEASE" "24"; then
+            local ext="zst"
+        else
+            local ext="xz"
+        fi
+        echo "https://downloads.openwrt.org/releases/$LEDE_RELEASE/targets/$LEDE_TARGET/$LEDE_SUBTARGET/openwrt-imagebuilder-$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET.Linux-x86_64.tar.$ext"
         return
     fi
     echo "$LEDE_BUILDER_URL"
