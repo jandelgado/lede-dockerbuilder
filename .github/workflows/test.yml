@@ -11,9 +11,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-          lfs: true
       - name: shellcheck
         run: shellcheck builder.sh
   testnix:
@@ -25,9 +22,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-          lfs: true
       - name: test build example
         run: |
           sh <(curl -L https://nixos.org/nix/install) --no-daemon
@@ -39,10 +33,6 @@ jobs:
           ./.test/run_all.sh example-${{ matrix.example }}.conf output/
   testcontainer:
     runs-on: ubuntu-24.04
-    env:
-      xDOCKER_BUILDKIT: 0
-      xBUILDKIT: 0
-      x_DOCKER_OPTS: --security-opt seccomp=unconfined --cap-add=SYS_ADMIN
     name: test container builds
     strategy:
       matrix:
@@ -58,7 +48,6 @@ jobs:
             sudo apt-get -y install podman
           fi
           mkdir -p output
-          env | grep -i DOCKER
           time ./builder.sh build-docker-image \
                   example-${{ matrix.example }}.conf ${{ matrix.option }}  &&\
           time ./builder.sh build \
