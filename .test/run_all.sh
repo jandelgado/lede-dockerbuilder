@@ -12,13 +12,15 @@ RC=0
 echo "----------------------------------------------------------------------"
 echo "run tests for $CONF"
 echo "----------------------------------------------------------------------"
-for t in "$SCRIPT_DIR"/test_*.sh; do 
+for t in "$SCRIPT_DIR"/test_*.sh; do
+	echo "******************** RUNNING CASE TEST $t ************************"
     if "$t" "$CONF" "$OUT"; then
-        echo "test OK"
+        echo ">>> TEST OK"
     else
-        echo "test FAILED"
+        echo ">>> TEST FAILED"
         RC=1
     fi
+	echo "******************************************************************"
 done
 
 exit $RC
