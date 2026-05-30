@@ -18,9 +18,16 @@ if [ ! -f "$MANIFEST" ]; then
     exit 1
 fi
 
-for p in $LEDE_PACKAGES; do 
+for p in $LEDE_PACKAGES; do
     [[ $p == -* ]] && continue
-    grep -q -E "^$p " "$MANIFEST" || fail "package not in manifest: $p"
+	grep -q -E "^$p " "$MANIFEST" || fail "package not in manifest: $p"
 done
+
+if [ $FAIL -ne 0 ]; then
+	echo "======== TEST FAILED ======="
+	echo "LEDE_PACKAGES: $LEDE_PACKAGES"
+	echo "MANIFEST: $MANIFEST"
+	cat "$MANIFEST"
+fi
 
 exit $FAIL
