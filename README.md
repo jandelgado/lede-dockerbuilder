@@ -4,23 +4,23 @@
 
 <!-- vim-markdown-toc GFM -->
 
-* [What](#what)
-  * [Note](#note)
-* [Why](#why)
-* [How](#how)
-  * [Using docker](#using-docker)
-  * [Using nix-shell](#using-nix-shell)
-  * [Usage](#usage)
-    * [Builder runtime](#builder-runtime)
-  * [Configuration file](#configuration-file)
-  * [File system overlay](#file-system-overlay)
-  * [Example directory structure](#example-directory-structure)
-    * [Debugging](#debugging)
-* [Examples](#examples)
-  * [Building a x86_64 image and running it in qemu](#building-a-x86_64-image-and-running-it-in-qemu)
-* [Building an OpenWrt snapshot release](#building-an-openwrt-snapshot-release)
-* [Author](#author)
-* [License](#license)
+- [What](#what)
+  - [Note](#note)
+- [Why](#why)
+- [How](#how)
+  - [Using docker](#using-docker)
+  - [Using nix-shell](#using-nix-shell)
+  - [Usage](#usage)
+    - [Builder runtime](#builder-runtime)
+  - [Configuration file](#configuration-file)
+  - [File system overlay](#file-system-overlay)
+  - [Example directory structure](#example-directory-structure)
+    - [Debugging](#debugging)
+- [Examples](#examples)
+  - [Building a x86_64 image and running it in Qemu](#building-a-x86_64-image-and-running-it-in-qemu)
+- [Building an OpenWrt snapshot release](#building-an-openwrt-snapshot-release)
+- [Author](#author)
+- [License](#license)
 
 <!-- vim-markdown-toc -->
 
@@ -179,32 +179,34 @@ self-contained projects outside of the lede-dockerbuilder folder. If e.g.
 rootfs-overlay directory is expected to be in the same directory as the
 configuration file.
 
-[Example configuration](example-nexx-wt3020.conf) for my [NEXX
-WT3020](https://openwrt.org/toh/nexx/wt3020) router, where I have an
-encrypted USB disk attached so I can use it as a simple NAS with samba and ftp:
+[Example configuration](example-glinet-gl-ar750.conf) for my [GL.iNet
+GL-AR750](https://openwrt.org/toh/gl.inet/gl-ar750?) router, where I have an encrypted USB disk
+attached so I can use it as a simple NAS with samba and ftp when I am on travel.
 
 ```
-# LEDE profile to use: NEXX WT3020
-LEDE_PROFILE=nexx_wt3020-8m
+# LEDE profile to use: GL.iNet GL-AR750
+LEDE_PROFILE=glinet_gl-ar750
 LEDE_RELEASE=25.12.4
-LEDE_TARGET=ramips
-LEDE_SUBTARGET=mt7620
+LEDE_TARGET=ath79
+LEDE_SUBTARGET=generic
 
 # list packages to include in LEDE image. prepend packages to deinstall with "-".
 #
-# include all packages to build a mobile NAS supporting disk encryption:
-# ksmbd (samba4 is too large now for the WT3020's 8MB), cryptsetup.
-# see https://github.com/namjaejeon/ksmbd-tools for ksmbd info.
-LEDE_PACKAGES="ksmbd-server lsblk block-mount\
-    kmod-usb-storage-uas kmod-scsi-core ntfs-3g\
-    kmod-nls-iso8859-1 cryptsetup kmod-crypto-xts\
-    kmod-mt76 kmod-usb2 kmod-usb-ohci kmod-usb-core kmod-dm kmod-crypto-ecb\
+# include all packages to build a mobile "NAS" supporting disk encryption:
+# vsftpd (needs to be configured afterwards), cryptsetup, usb disk drivers.
+LEDE_PACKAGES="-ath10k-firmware-qca9887-ct ath10k-firmware-qca9887-ct-full-htt \
+    ksmbd-server hd-idle luci-app-hd-idle diffutils\
+    kmod-usb-storage-uas kmod-scsi-core kmod-fs-ext4 ntfs-3g\
+    kmod-nls-cp437 kmod-nls-iso8859-1 vsftpd cryptsetup kmod-crypto-xts\
+    kmod-mt76 kmod-usb2 kmod-usb-ohci kmod-usb-core usbutils\
+    block-mount kmod-dm kmod-crypto-ecb \
     kmod-crypto-misc kmod-crypto-cbc kmod-crypto-crc32c kmod-crypto-hash\
-    kmod-crypto-user\
-    -ppp -kmod-ppp -kmod-pppoe -kmod-pppox -ppp-mod-pppoe -opkg\
-    -ip6tables -odhcp6c -kmod-ipv6 -kmod-ip6tables -odhcpd-ipv6only"
+    kmod-crypto-user iwinfo dropbear \
+    -ppp -kmod-ppp -kmod-pppoe -kmod-pppox -ppp-mod-pppoe nmap tcpdump\
+    kmod-wireguard luci-proto-wireguard wireguard-tools\
+    luci-ssl lsblk adblock luci-app-adblock"
 
-# optionally override OUTPUT_DIR and ROOTFS_OVERLAY directory location here
+LEDE_DISABLED_SERVICES=""
 ```
 
 ### File system overlay
@@ -272,7 +274,7 @@ These examples evolved from images I use myself.
   Just ~8MB gziped. I use this image on my home dnsmasq/openvpn 'server'.
 - [image with LUCI web GUI and adblocker for the Raspberry Pi 4](example-rpi4.conf)
 - [image for the TP-Link WR1043ND](example-wrt1043nd.conf)
-- [image with samba, vsftpd and encrypted usb disk for
+- [image ~with samba, vsftpd and encrypted usb disk~ (image with 25.12. became too large) for
   NEXX-WT3020](example-nexx-wt3020.conf). Is the predecessor of ...
 - [image with samba, vsftpd and encrypted usb disk for
   GINET-GL-M300N V2](example-glinet-gl-mt300n-v2.conf). Is the predecessor of ...
@@ -284,22 +286,22 @@ These examples evolved from images I use myself.
 To build an example run `./builder.sh build <config-file>`, e.g.
 
 ```text
-$ ./builder.sh build example-rpi2.conf
+$ ./builder.sh build example-rpi2.conf --nix
 ```
 
 The resulting image can be found in the `output/` directory. The [OpenWrt
 wiki](https://openwrt.org/docs/guide-user/installation/generic.sysupgrade)
 describes how to flash the new image in detail.
 
-### Building a x86_64 image and running it in qemu
+### Building a x86_64 image and running it in Qemu
 
 The [example-x86_64.conf](example-x86_64.conf) file can be used to build a
-x86_64 based OpenWrt image which can also be run in qemu, e.g., if you need
+x86_64 based OpenWrt image which can also be run in Qemu, e.g., if you need
 a virtual router/firewall.
 
 First build the image with e.g. `builder.sh build example-x86_64.conf --nix`, then unpack the
 resulting image with e.g. `gunzip output/openwrt-&lt;release&gt;-x86-64-generic-ext4-combined.img.gz`.
-Finally the image can be started with qemu (or simply use [run_in_qemu.sh](etc/run_in_qemu.sh) and
+Finally the image can be started with Qemu (or simply use [run_in_qemu.sh](etc/run_in_qemu.sh) and
 pass it the image name to boot)
 
 ```text
