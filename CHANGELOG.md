@@ -3,6 +3,7 @@
 ## v3.9 [2026-05-30]
 
 - Upgrade to OpenWrt 25.12.4
+- Bugfixes and test refactoring
 
 ## v3.8 [2025-02-09]
 

@@ -63,7 +63,6 @@ Example:
   # use nix to build the OpenWrt image, no need to build a container first
   $PROG build example-x86_64.conf --nix
 EOT
-    exit 0
 }
 
 # return given file path as absolute path. path to file must exist.
@@ -83,7 +82,7 @@ function build_docker_image  {
 }
 
 function run_cmd_in_nix_shell {
-    nix-shell --pure --run "bash -c '$*'"
+    nix-shell --pure --run "$*"
 }
 
 function run_cmd_in_container {
@@ -103,9 +102,9 @@ function run_cmd_in_container {
         -v "$(abspath "$ROOTFS_OVERLAY")":/lede/rootfs-overlay \
         -v "$(abspath "$OUTPUT_DIR")":/lede/output \
         "${repositories_volume[@]}" \
-        ${DOCKER_OPTS[@]} \
+        "${DOCKER_OPTS[@]}" \
         ${_DOCKER_OPTS:-} \
-        --rm "$(image_tag)" bash -c "$*"
+        "$(image_tag)" bash -c "$*"
 }
 
 function run_cmd {
@@ -162,11 +161,16 @@ download_builder() {
         return
     fi
 
-    mkdir -p "$dir"
-    echo curl "download $url -> $dir" 
-    curl --progress-bar "$url" -o "$dir/tmpbuilder" \
-         && tar xfa "$dir/tmpbuilder" --strip-components=1 -C "$dir" \
-         && rm "$dir/tmpbuilder"
+    local tmpdir="${dir}.tmp"
+    rm -rf "$tmpdir"
+    mkdir -p "$tmpdir"
+    trap 'rm -rf "$tmpdir"' ERR INT TERM
+    echo "downloading $url -> $dir"
+    curl --progress-bar "$url" -o "$tmpdir/tmpbuilder" \
+         && tar xfa "$tmpdir/tmpbuilder" --strip-components=1 -C "$tmpdir" \
+         && rm "$tmpdir/tmpbuilder" \
+         && mv "$tmpdir" "$dir"
+    trap - ERR INT TERM
 }
 
 function print_config {
@@ -195,7 +199,7 @@ EOT
 # tests if given version is at least provided reference version.
 # version_ge_than("23.05.1", "24") -> false
 # version_ge_than("24.0.10", "24") -> true
-function version_ge_than { [ "${1%%.*}" -ge "$2" ]; }
+function version_ge_than { local major="${1%%.*}"; [[ "$major" =~ ^[0-9]+$ ]] && [ "$major" -ge "$2" ]; }
 
 # return default LEDE_BUILDER_URL if not overriden in configuration file
 function builder_url {
@@ -300,7 +304,7 @@ function dispatch_command {
              run_cmd "$cmd"
              ;;
          build-docker-image)
-             [ "$RUNTIME" == "nix" ] && warn "refusing to build docker image when using --nix" && exit
+             [ "$RUNTIME" == "nix" ] && warn "refusing to build docker image when using --nix" && exit 1
              print_config
              build_docker_image "$(builder_url)" "$(image_tag)"
              ;;
@@ -313,7 +317,6 @@ function dispatch_command {
              ;;
          *)
             usage "$0"
-            # shellcheck disable=2317
             exit 0
             ;;
     esac
@@ -321,7 +324,6 @@ function dispatch_command {
 
 if [ $# -lt 2 ]; then
     usage "$0"
-    # shellcheck disable=2317
     exit 1
 fi
 

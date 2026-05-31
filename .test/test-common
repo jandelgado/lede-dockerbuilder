@@ -1,0 +1,22 @@
+CONF="$1"
+source "$1"
+DIR="$2"
+FAIL=0
+
+if [[ "$LEDE_RELEASE" == "snapshots" ]]; then
+    PREFIX="openwrt-$LEDE_TARGET-$LEDE_SUBTARGET-$LEDE_PROFILE"
+else
+    PREFIX="openwrt-$LEDE_RELEASE-$LEDE_TARGET-$LEDE_SUBTARGET-$LEDE_PROFILE"
+fi
+
+fail() {
+    echo "FAIL: $*"
+    FAIL=1
+}
+
+dump_context() {
+    echo "conf:     $CONF"
+    echo "output:   $DIR"
+    echo "prefix:   $PREFIX"
+    echo "packages: $LEDE_PACKAGES"
+}
